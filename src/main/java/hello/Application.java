@@ -38,7 +38,7 @@ public class Application implements CommandLineRunner {
         try {
             RestTemplate restTemplate =  new RestTemplate();
             Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-            log.info(quote.toString());
+            if (quote != null) { log.info(quote.toString()); }
         } catch (Exception e) {
             log.warn("Could not fetch quote from external service: {}", e.getMessage());
         }
@@ -56,7 +56,7 @@ public class Application implements CommandLineRunner {
             try {
                 Quote quote = restTemplate.getForObject(
                         "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-                log.info(quote.toString());
+                if (quote != null) { log.info(quote.toString()); }
             } catch (Exception e) {
                 log.warn("Could not fetch quote from external service: {}", e.getMessage());
             }
