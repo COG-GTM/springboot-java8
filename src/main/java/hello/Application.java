@@ -35,9 +35,13 @@ public class Application implements CommandLineRunner {
             System.out.println(beanName);
         }
 
-        RestTemplate restTemplate =  new RestTemplate();
-        Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-        log.info(quote.toString());
+        try {
+            RestTemplate restTemplate =  new RestTemplate();
+            Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+            log.info(quote.toString());
+        } catch (Exception e) {
+            log.warn("Could not fetch quote from external service: {}", e.getMessage());
+        }
     }
 
 
@@ -49,9 +53,13 @@ public class Application implements CommandLineRunner {
     @Bean
     public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
         return args -> {
-            Quote quote = restTemplate.getForObject(
-                    "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-            log.info(quote.toString());
+            try {
+                Quote quote = restTemplate.getForObject(
+                        "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+                log.info(quote.toString());
+            } catch (Exception e) {
+                log.warn("Could not fetch quote from external service: {}", e.getMessage());
+            }
         };
     }
 
