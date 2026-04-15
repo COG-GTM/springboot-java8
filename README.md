@@ -1,5 +1,5 @@
-# springboot-java8
-The project is made on spring boot. The project summarize the new features present in Java 8.
+# springboot-java11
+The project is made on spring boot. The project summarize the new features present in Java 8 and has been migrated to Java 11.
 It contain list of harcoded topics list. You can call the apis's with POSTMAN to add,delete,update Topic list
 In addition, it uses 
 1) Java 8 NIO methods 
@@ -76,7 +76,7 @@ GET /datetime
 
 ### Prerequisites
 
-1) Java sdk
+1) Java 11 SDK
 2) POSTMAN
 
 ### Installing
@@ -129,6 +129,6 @@ https://dzone.com/articles/java-8-friday-goodies-new-new
 
 ## Authors
 
-* **Rehman Murad Ali** 
+* **Rehman Murad Ali**  
 
 
