@@ -2,6 +2,8 @@ package hello.service;
 
 import hello.declaration.CustomPredicate;
 import hello.model.Topic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -18,6 +20,7 @@ import java.util.stream.Stream;
 @Service
 public class TopicService {
 
+    private static final Logger log = LoggerFactory.getLogger(TopicService.class);
 
     private List<Topic> topics = new ArrayList<>(Arrays.asList(
             new Topic("spring", "Spring Framework", "Spring Framework Description"),
@@ -30,13 +33,14 @@ public class TopicService {
     }
 
     /**
-     * Strean Example
+     * Stream Example
      *
      * @param id
      * @return
      */
     public Topic getTopicWithId(String id) {
-        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst().get();
+        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Topic not found with id: " + id));
     }
 
     public void addTopic(Topic topic) {
@@ -55,7 +59,7 @@ public class TopicService {
     }
 
     /**
-     * Lamda Expressions
+     * Lambda Expressions
      *
      * @param id
      */
@@ -64,7 +68,7 @@ public class TopicService {
     }
 
     /**
-     * Calling fucntional Interface
+     * Calling functional Interface
      *
      * @param minLength
      * @return
@@ -223,8 +227,8 @@ public class TopicService {
      * @return
      */
     public String readFileWithStreamFunction() {
-        Path path = Paths.get("temp.txt");
-        System.out.println();
+        Path path = Paths.get("src/main/resources/temp.txt");
+        log.info("Reading file: {}", path);
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String lines = reader
                     .lines()
