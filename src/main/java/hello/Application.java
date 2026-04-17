@@ -36,8 +36,12 @@ public class Application implements CommandLineRunner {
         }
 
         RestTemplate restTemplate =  new RestTemplate();
-        Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-        log.info(quote.toString());
+        try {
+            Quote quote = restTemplate.getForObject("https://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+            log.info(quote.toString());
+        } catch (Exception e) {
+            log.warn("Could not reach external quote service: {}", e.getMessage());
+        }
     }
 
 
@@ -49,9 +53,13 @@ public class Application implements CommandLineRunner {
     @Bean
     public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
         return args -> {
-            Quote quote = restTemplate.getForObject(
-                    "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-            log.info(quote.toString());
+            try {
+                Quote quote = restTemplate.getForObject(
+                        "https://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+                log.info(quote.toString());
+            } catch (Exception e) {
+                log.warn("Could not reach external quote service: {}", e.getMessage());
+            }
         };
     }
 
@@ -80,8 +88,9 @@ public class Application implements CommandLineRunner {
 
         log.info("Querying for customer records where first_name = 'Josh':");
         jdbcTemplate.query(
-                "SELECT id, first_name, last_name FROM customers WHERE first_name = ?", new Object[]{"Josh"},
-                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
+                "SELECT id, first_name, last_name FROM customers WHERE first_name = ?",
+                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name")),
+                "Josh"
         ).forEach(customer -> log.info(customer.toString()));
 
     }
