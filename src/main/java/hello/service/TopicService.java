@@ -4,11 +4,6 @@ import hello.declaration.CustomPredicate;
 import hello.model.Topic;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -155,86 +150,6 @@ public class TopicService {
                 .filter(pattern.asPredicate())
                 .collect(Collectors.toList())
                 .toString();
-    }
-
-
-    /**
-     * NIO Java API
-     * Use Streams with files
-     * Try with resource, "Autoclose"
-     *
-     * @return
-     */
-    public String findAllFilesInPathAndSort() {
-        try (Stream<Path> stream = Files.list(Paths.get(""))) {
-            String joined = stream
-                    .map(String::valueOf)
-                    .filter(path -> !path.startsWith("."))
-                    .sorted()
-                    .collect(Collectors.joining("; "));
-            return joined;
-        } catch (IOException e) {
-            return " Error in IO";
-        }
-    }
-
-    /**
-     * Using File.find function to find file
-     * @return
-     */
-    public String findParticularFileInPathAndSort() {
-        Path start = Paths.get("");
-        int maxDepth = 25;
-        try (Stream<Path> stream = Files.find(start, maxDepth, (path, attr) ->
-                String.valueOf(path).startsWith("grad"))) {
-            String joined = stream
-                    .sorted()
-                    .map(String::valueOf)
-                    .collect(Collectors.joining("; "));
-            return joined;
-        } catch (IOException e) {
-            return " IO exception ";
-        }
-    }
-
-
-    /**
-     * Using Files.Walk Function to find File
-     * @return
-     */
-    public String findParticularFileInPathAndSortWithWalkFunction() {
-        Path start = Paths.get("");
-        int maxDepth = 5;
-        try (Stream<Path> stream = Files.walk(start, maxDepth)) {
-            String joined = stream
-                    .map(String::valueOf)
-                    .filter(path -> path.startsWith("grad"))
-                    .sorted()
-                    .collect(Collectors.joining("; "));
-            return joined;
-        } catch (IOException e) {
-            return " IO exception ";
-        }
-    }
-
-
-    /**
-     * Use BufferedReader with Stream functions
-     * @return
-     */
-    public String readFileWithStreamFunction() {
-        Path path = Paths.get("temp.txt");
-        System.out.println();
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
-            String lines = reader
-                    .lines()
-                    .filter(line->line.contains("print"))
-                    .map(line->line.substring("print".length()))
-                    .collect(Collectors.joining(","));
-            return  lines;
-        } catch (IOException e) {
-            return " IO exception ";
-        }
     }
 
 }
