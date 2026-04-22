@@ -3,8 +3,17 @@ package hello.controller;
 import hello.model.Topic;
 import hello.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,9 +27,9 @@ public class TopicController {
      * Get all Topic
      * @return
      */
-    @RequestMapping("/topic")
-    public List<Topic> getAllTopics() {
-        return topicService.getAllTopics();
+    @GetMapping("/topic")
+    public ResponseEntity<List<Topic>> getAllTopics() {
+        return ResponseEntity.ok(topicService.getAllTopics());
     }
 
     /**
@@ -28,18 +37,19 @@ public class TopicController {
      * @param id
      * @return
      */
-    @RequestMapping("/topic/{id}")
-    public Topic getTopicWithID(@PathVariable String id) {
-        return topicService.getTopicWithId(id);
+    @GetMapping("/topic/{id}")
+    public ResponseEntity<Topic> getTopicWithID(@PathVariable String id) {
+        return ResponseEntity.ok(topicService.getTopicWithId(id));
     }
 
     /**
      * Add a new topic in list
      * @param topic
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/topic")
-    public void addTopic(@RequestBody Topic topic) {
+    @PostMapping("/topic")
+    public ResponseEntity<Void> addTopic(@Valid @RequestBody Topic topic) {
         topicService.addTopic(topic);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -47,9 +57,10 @@ public class TopicController {
      * @param id
      * @param topic
      */
-    @RequestMapping(method = RequestMethod.PUT, value = "/topic/{id}")
-    public void updateTopic(@PathVariable String id, @RequestBody Topic topic) {
+    @PutMapping("/topic/{id}")
+    public ResponseEntity<Void> updateTopic(@PathVariable String id, @Valid @RequestBody Topic topic) {
         topicService.updateTopic(id, topic);
+        return ResponseEntity.ok().build();
     }
 
 
@@ -57,9 +68,10 @@ public class TopicController {
      * Delete a topic with ID
      * @param id
      */
-    @RequestMapping(method = RequestMethod.DELETE, value = "/topic/{id}")
-    public void deleteTopic(@PathVariable String id) {
+    @DeleteMapping("/topic/{id}")
+    public ResponseEntity<Void> deleteTopic(@PathVariable String id) {
         topicService.deleteTopic(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -67,9 +79,9 @@ public class TopicController {
      * @param minLength
      * @return
      */
-    @RequestMapping(value = "/topic/minimum/length/{minLength}")
-    public List<Topic> filterMinimumLengthForId(@PathVariable Integer minLength) {
-        return topicService.filterMinimumLengthForId(minLength);
+    @GetMapping("/topic/minimum/length/{minLength}")
+    public ResponseEntity<List<Topic>> filterMinimumLengthForId(@PathVariable Integer minLength) {
+        return ResponseEntity.ok(topicService.filterMinimumLengthForId(minLength));
     }
 
 
@@ -77,9 +89,9 @@ public class TopicController {
      * Sort with Id
      * @return
      */
-    @RequestMapping("/topic/sort")
-    public List<Topic> sortTopicsWithID() {
-        return topicService.sortTopicsWithID();
+    @GetMapping("/topic/sort")
+    public ResponseEntity<List<Topic>> sortTopicsWithID() {
+        return ResponseEntity.ok(topicService.sortTopicsWithID());
     }
 
 

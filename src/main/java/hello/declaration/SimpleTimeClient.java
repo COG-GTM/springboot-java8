@@ -1,6 +1,4 @@
-package hello.model;
-
-import hello.declaration.TimeClient;
+package hello.declaration;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
