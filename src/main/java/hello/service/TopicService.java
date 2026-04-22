@@ -1,6 +1,7 @@
 package hello.service;
 
 import hello.declaration.CustomPredicate;
+import hello.exception.TopicNotFoundException;
 import hello.model.Topic;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -19,7 +21,7 @@ import java.util.stream.Stream;
 public class TopicService {
 
 
-    private List<Topic> topics = new ArrayList<>(Arrays.asList(
+    private List<Topic> topics = new CopyOnWriteArrayList<>(Arrays.asList(
             new Topic("spring", "Spring Framework", "Spring Framework Description"),
             new Topic("java", "Core Java", "Java Description"),
             new Topic("javascript", "javascript Framework", "javascript Framework Description")
@@ -36,7 +38,10 @@ public class TopicService {
      * @return
      */
     public Topic getTopicWithId(String id) {
-        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst().get();
+        return topics.stream()
+                .filter(topic -> topic.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new TopicNotFoundException("Topic not found with id: " + id));
     }
 
     public void addTopic(Topic topic) {
@@ -96,8 +101,9 @@ public class TopicService {
      * @return
      */
     public List<Topic> sortTopicsWithID() {
-        topics.sort(Comparator.comparing(Topic::getId));
-        return topics;
+        return topics.stream()
+                .sorted(Comparator.comparing(Topic::getId))
+                .collect(Collectors.toList());
     }
 
 
@@ -166,7 +172,7 @@ public class TopicService {
      * @return
      */
     public String findAllFilesInPathAndSort() {
-        try (Stream<Path> stream = Files.list(Paths.get(""))) {
+        try (Stream<Path> stream = Files.list(Paths.get(System.getProperty("user.dir")))) {
             String joined = stream
                     .map(String::valueOf)
                     .filter(path -> !path.startsWith("."))
@@ -183,7 +189,7 @@ public class TopicService {
      * @return
      */
     public String findParticularFileInPathAndSort() {
-        Path start = Paths.get("");
+        Path start = Paths.get(System.getProperty("user.dir"));
         int maxDepth = 25;
         try (Stream<Path> stream = Files.find(start, maxDepth, (path, attr) ->
                 String.valueOf(path).startsWith("grad"))) {
@@ -203,7 +209,7 @@ public class TopicService {
      * @return
      */
     public String findParticularFileInPathAndSortWithWalkFunction() {
-        Path start = Paths.get("");
+        Path start = Paths.get(System.getProperty("user.dir"));
         int maxDepth = 5;
         try (Stream<Path> stream = Files.walk(start, maxDepth)) {
             String joined = stream
@@ -223,7 +229,7 @@ public class TopicService {
      * @return
      */
     public String readFileWithStreamFunction() {
-        Path path = Paths.get("temp.txt");
+        Path path = Paths.get(System.getProperty("java.io.tmpdir"), "springboot-java8-temp.txt");
         System.out.println();
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String lines = reader

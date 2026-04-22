@@ -1,23 +1,16 @@
 package hello.controller;
 
+import hello.declaration.SimpleTimeClient;
 import hello.declaration.TimeClient;
-import hello.model.SimpleTimeClient;
-import hello.model.Topic;
 import hello.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.chrono.ChronoPeriod;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 @RestController
 public class HelloController {
@@ -43,7 +36,7 @@ public class HelloController {
      *
      * @return
      */
-    @RequestMapping("/datetime")
+    @GetMapping("/datetime")
     public String index() {
         TimeClient myTimeClient = new SimpleTimeClient();
         LocalDateTime localDateTime = LocalDateTime.now();
@@ -63,7 +56,7 @@ public class HelloController {
      *
      * @return
      */
-    @RequestMapping("/topic/string/operation")
+    @GetMapping("/topic/string/operation")
     public String showStringOperation() {
 
         String join = topicService.returnAllTopicIDWithStringSlicing();
@@ -84,7 +77,7 @@ public class HelloController {
      * File Operation in Java 8
      * @return
      */
-    @RequestMapping("/topic/file/operation")
+    @GetMapping("/topic/file/operation")
     public String showFileOperation() {
         String findAllFilesInPathAndSort = topicService.findAllFilesInPathAndSort();
         String findParticularFileInPathAndSort = topicService.findParticularFileInPathAndSort();
