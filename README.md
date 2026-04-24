@@ -1,5 +1,5 @@
-# springboot-java8
-The project is made on spring boot. The project summarize the new features present in Java 8.
+# springboot-java15
+The project is made on spring boot. The project summarizes the features present in Java 8 through Java 15.
 It contain list of harcoded topics list. You can call the apis's with POSTMAN to add,delete,update Topic list
 In addition, it uses 
 1) Java 8 NIO methods 
@@ -13,6 +13,8 @@ In addition, it uses
 9) Default and Static methods in interface
 10) Java 8 LocalDateTime API
 11) Pattern
+12) Java 10+ local variable type inference (var)
+13) Java 15 text blocks
 
 
 
@@ -76,11 +78,10 @@ GET /datetime
 
 ### Prerequisites
 
-1) Java sdk
+1) Java 15 SDK
 2) POSTMAN
 
 ### Installing
-
 
 
 ```
@@ -129,6 +130,4 @@ https://dzone.com/articles/java-8-friday-goodies-new-new
 
 ## Authors
 
-* **Rehman Murad Ali** 
-
-
+* **Rehman Murad Ali**

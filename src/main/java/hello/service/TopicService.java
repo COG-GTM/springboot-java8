@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -19,7 +18,7 @@ import java.util.stream.Stream;
 public class TopicService {
 
 
-    private List<Topic> topics = new ArrayList<>(Arrays.asList(
+    private final List<Topic> topics = new ArrayList<>(List.of(
             new Topic("spring", "Spring Framework", "Spring Framework Description"),
             new Topic("java", "Core Java", "Java Description"),
             new Topic("javascript", "javascript Framework", "javascript Framework Description")
@@ -30,13 +29,13 @@ public class TopicService {
     }
 
     /**
-     * Strean Example
-     *
-     * @param id
-     * @return
+     * Stream Example
      */
     public Topic getTopicWithId(String id) {
-        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst().get();
+        return topics.stream()
+                .filter(topic -> topic.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     public void addTopic(Topic topic) {
@@ -45,29 +44,25 @@ public class TopicService {
 
     /**
      * IntStream examples
-     *
-     * @param id
-     * @param topic
      */
     public void updateTopic(String id, Topic topic) {
-        OptionalInt indexOfElement = IntStream.range(0, topics.size()).filter(index -> id.equals(topics.get(index).getId())).findFirst();
-        if (indexOfElement.isPresent()) topics.set(indexOfElement.getAsInt(), topic);
+        var indexOfElement = IntStream.range(0, topics.size())
+                .filter(index -> id.equals(topics.get(index).getId()))
+                .findFirst();
+        if (indexOfElement.isPresent()) {
+            topics.set(indexOfElement.getAsInt(), topic);
+        }
     }
 
     /**
-     * Lamda Expressions
-     *
-     * @param id
+     * Lambda Expressions
      */
     public void deleteTopic(String id) {
         topics.removeIf(topic -> topic.getId().equals(id));
     }
 
     /**
-     * Calling fucntional Interface
-     *
-     * @param minLength
-     * @return
+     * Calling functional Interface
      */
     public List<Topic> filterMinimumLengthForId(Integer minLength) {
         return printTopicsWithPredicate(topics, topic -> topic.getId().length() > minLength);
@@ -76,13 +71,9 @@ public class TopicService {
 
     /**
      * Functional Interface example With ForEach
-     *
-     * @param topicList
-     * @param tester
-     * @return
      */
     private static List<Topic> printTopicsWithPredicate(List<Topic> topicList, CustomPredicate<Topic> tester) {
-        List<Topic> resultTopic = new ArrayList<>();
+        var resultTopic = new ArrayList<Topic>();
         topicList.forEach(topic -> {
             if (tester.test(topic)) resultTopic.add(topic);
         });
@@ -92,8 +83,6 @@ public class TopicService {
 
     /**
      * Using Comparator to sort
-     *
-     * @return
      */
     public List<Topic> sortTopicsWithID() {
         topics.sort(Comparator.comparing(Topic::getId));
@@ -103,20 +92,17 @@ public class TopicService {
 
     /**
      * Join List of Strings
-     *
-     * @return
      */
     public String returnAllTopicIDWithStringSlicing() {
-        List<String> topicIds = topics.stream().map(topic -> topic.getId()).collect(Collectors.toList());
+        var topicIds = topics.stream()
+                .map(Topic::getId)
+                .collect(Collectors.toList());
         return String.join(":", topicIds);
     }
 
 
     /**
      * Use of MapToObject and distinct
-     *
-     * @param join
-     * @return
      */
     public String makeDistinctAndSortCharacters(String join) {
         return join.chars().distinct()
@@ -128,9 +114,6 @@ public class TopicService {
 
     /**
      * Use of Pattern Class with stream
-     *
-     * @param join
-     * @return
      */
     public String splitAllIdWithColonSelectIDWithJavaKeywordThenSortThenJoin(String join) {
         return Pattern.compile(":")
@@ -143,13 +126,12 @@ public class TopicService {
 
     /**
      * Apply Regex as Predicate with Stream
-     * @return
      */
     public String findIdHavingCharacter() {
-        Pattern pattern = Pattern.compile(".*g.*");
-        Object[] topicIdObjectList = topics.stream().map(topic -> topic.getId()).collect(Collectors.toList()).toArray();
-
-        String[] topicIdList = Arrays.stream(topicIdObjectList).toArray(String[]::new);
+        var pattern = Pattern.compile(".*g.*");
+        var topicIdList = topics.stream()
+                .map(Topic::getId)
+                .toArray(String[]::new);
 
         return Stream.of(topicIdList)
                 .filter(pattern.asPredicate())
@@ -162,17 +144,14 @@ public class TopicService {
      * NIO Java API
      * Use Streams with files
      * Try with resource, "Autoclose"
-     *
-     * @return
      */
     public String findAllFilesInPathAndSort() {
-        try (Stream<Path> stream = Files.list(Paths.get(""))) {
-            String joined = stream
+        try (var stream = Files.list(Path.of(""))) {
+            return stream
                     .map(String::valueOf)
                     .filter(path -> !path.startsWith("."))
                     .sorted()
                     .collect(Collectors.joining("; "));
-            return joined;
         } catch (IOException e) {
             return " Error in IO";
         }
@@ -180,18 +159,16 @@ public class TopicService {
 
     /**
      * Using File.find function to find file
-     * @return
      */
     public String findParticularFileInPathAndSort() {
-        Path start = Paths.get("");
-        int maxDepth = 25;
-        try (Stream<Path> stream = Files.find(start, maxDepth, (path, attr) ->
+        var start = Path.of("");
+        var maxDepth = 25;
+        try (var stream = Files.find(start, maxDepth, (path, attr) ->
                 String.valueOf(path).startsWith("grad"))) {
-            String joined = stream
+            return stream
                     .sorted()
                     .map(String::valueOf)
                     .collect(Collectors.joining("; "));
-            return joined;
         } catch (IOException e) {
             return " IO exception ";
         }
@@ -200,18 +177,16 @@ public class TopicService {
 
     /**
      * Using Files.Walk Function to find File
-     * @return
      */
     public String findParticularFileInPathAndSortWithWalkFunction() {
-        Path start = Paths.get("");
-        int maxDepth = 5;
-        try (Stream<Path> stream = Files.walk(start, maxDepth)) {
-            String joined = stream
+        var start = Path.of("");
+        var maxDepth = 5;
+        try (var stream = Files.walk(start, maxDepth)) {
+            return stream
                     .map(String::valueOf)
                     .filter(path -> path.startsWith("grad"))
                     .sorted()
                     .collect(Collectors.joining("; "));
-            return joined;
         } catch (IOException e) {
             return " IO exception ";
         }
@@ -220,18 +195,15 @@ public class TopicService {
 
     /**
      * Use BufferedReader with Stream functions
-     * @return
      */
     public String readFileWithStreamFunction() {
-        Path path = Paths.get("temp.txt");
-        System.out.println();
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
-            String lines = reader
+        var path = Path.of("temp.txt");
+        try (var reader = Files.newBufferedReader(path)) {
+            return reader
                     .lines()
-                    .filter(line->line.contains("print"))
-                    .map(line->line.substring("print".length()))
+                    .filter(line -> line.contains("print"))
+                    .map(line -> line.substring("print".length()))
                     .collect(Collectors.joining(","));
-            return  lines;
         } catch (IOException e) {
             return " IO exception ";
         }
