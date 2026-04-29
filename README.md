@@ -1,8 +1,8 @@
 # springboot-java8
-The project is made on spring boot. The project summarize the new features present in Java 8.
-It contain list of harcoded topics list. You can call the apis's with POSTMAN to add,delete,update Topic list
-In addition, it uses 
-1) Java 8 NIO methods 
+A Spring Boot project demonstrating Java features including streams, lambdas, NIO, and more.
+It contains a list of hardcoded topics. You can call the APIs with POSTMAN to add, delete, update the Topic list.
+In addition, it uses:
+1) Java NIO methods
 2) String operations
 3) Stream operations
 4) IntStream functions
@@ -11,14 +11,32 @@ In addition, it uses
 7) Optional datatype
 8) Foreach loops
 9) Default and Static methods in interface
-10) Java 8 LocalDateTime API
+10) Java LocalDateTime API
 11) Pattern
 
 
 
+## Requirements
+
+- **Java 21**
+- **Spring Boot 3.4.5**
+- **Maven 3.9.9** (via Maven Wrapper) or **Gradle 8.12** (via Gradle Wrapper)
+
 ## Getting Started
-1) Download or clone the project with link 
-(https://github.com/RehmanMuradAli/springboot-java8/)
+
+### Build & Run with Maven
+```bash
+./mvnw clean package
+java -jar target/gs-spring-boot-0.1.0.jar
+```
+
+### Build & Run with Gradle
+```bash
+./gradlew build
+java -jar build/libs/gs-spring-boot-0.1.0.jar
+```
+
+The application starts on `http://localhost:8080`.
 
 ## Available API's
 
@@ -67,28 +85,11 @@ File Operations on Topic List
 ```
 GET /topic/file/operation
 ```
-Java 8 Date Time example
+Java Date Time example
 ```
 GET /datetime
 ```
 
-
-
-### Prerequisites
-
-1) Java sdk
-2) POSTMAN
-
-### Installing
-
-
-
-```
-1) Download or clone
-2) Import the project
-3) Run on location machine
-4) Open Postman, to call API's (  localhost:8080 )
-```
 
 
 ## Helpful Links
@@ -96,11 +97,9 @@ Spring:
 
 https://spring.io/guides
 
-Java 8: 
+Java:
 
 http://www.baeldung.com/java-8-functional-interfaces
-
-http://winterbe.com/posts/2015/05/22/java8-concurrency-tutorial-atomic-concurrent-map-examples/
 
 https://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html
 
@@ -126,9 +125,8 @@ https://dzone.com/articles/java-8-friday-goodies-new-new
 ## Built With
 
 * [Maven](https://maven.apache.org/) - Dependency Management
+* [Spring Boot](https://spring.io/projects/spring-boot) - Application Framework
 
 ## Authors
 
-* **Rehman Murad Ali** 
-
-
+* **Rehman Murad Ali**
