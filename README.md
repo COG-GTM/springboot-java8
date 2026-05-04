@@ -1,5 +1,5 @@
 # springboot-java8
-The project is made on spring boot. The project summarize the new features present in Java 8.
+The project is made on Spring Boot 3.x running on Java 17. The project summarizes the new features that were originally introduced in Java 8.
 It contain list of harcoded topics list. You can call the apis's with POSTMAN to add,delete,update Topic list
 In addition, it uses 
 1) Java 8 NIO methods 
@@ -76,8 +76,10 @@ GET /datetime
 
 ### Prerequisites
 
-1) Java sdk
+1) Java 17 SDK
 2) POSTMAN
+
+> Note: This project now targets Spring Boot 3.x, which requires Java 17 or newer.
 
 ### Installing
 
