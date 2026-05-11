@@ -36,8 +36,12 @@ public class Application implements CommandLineRunner {
         }
 
         RestTemplate restTemplate =  new RestTemplate();
-        Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-        log.info(quote.toString());
+        try {
+            Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+            log.info(quote.toString());
+        } catch (Exception e) {
+            log.warn("Skipping demo quote fetch: {}", e.getMessage());
+        }
     }
 
 
@@ -49,9 +53,13 @@ public class Application implements CommandLineRunner {
     @Bean
     public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
         return args -> {
-            Quote quote = restTemplate.getForObject(
-                    "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-            log.info(quote.toString());
+            try {
+                Quote quote = restTemplate.getForObject(
+                        "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+                log.info(quote.toString());
+            } catch (Exception e) {
+                log.warn("Skipping demo quote fetch: {}", e.getMessage());
+            }
         };
     }
 
@@ -63,7 +71,7 @@ public class Application implements CommandLineRunner {
     public void run(String... args) throws Exception {
         log.info("Creating tables");
 
-        jdbcTemplate.execute("DROP TABLE customers IF EXISTS");
+        jdbcTemplate.execute("DROP TABLE IF EXISTS customers");
         jdbcTemplate.execute("CREATE TABLE customers(id SERIAL, first_name VARCHAR(255), last_name VARCHAR(255))");
 
         // Split up the array of whole names into an array of first/last names
@@ -80,8 +88,9 @@ public class Application implements CommandLineRunner {
 
         log.info("Querying for customer records where first_name = 'Josh':");
         jdbcTemplate.query(
-                "SELECT id, first_name, last_name FROM customers WHERE first_name = ?", new Object[]{"Josh"},
-                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
+                "SELECT id, first_name, last_name FROM customers WHERE first_name = ?",
+                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name")),
+                "Josh"
         ).forEach(customer -> log.info(customer.toString()));
 
     }
