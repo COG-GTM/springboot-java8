@@ -2,22 +2,14 @@ package hello.controller;
 
 import hello.declaration.TimeClient;
 import hello.model.SimpleTimeClient;
-import hello.model.Topic;
 import hello.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.chrono.ChronoPeriod;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 @RestController
 public class HelloController {

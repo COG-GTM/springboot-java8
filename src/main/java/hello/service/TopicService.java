@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -19,7 +20,7 @@ import java.util.stream.Stream;
 public class TopicService {
 
 
-    private List<Topic> topics = new ArrayList<>(Arrays.asList(
+    private List<Topic> topics = new CopyOnWriteArrayList<>(Arrays.asList(
             new Topic("spring", "Spring Framework", "Spring Framework Description"),
             new Topic("java", "Core Java", "Java Description"),
             new Topic("javascript", "javascript Framework", "javascript Framework Description")
@@ -36,7 +37,8 @@ public class TopicService {
      * @return
      */
     public Topic getTopicWithId(String id) {
-        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst().get();
+        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Topic not found with id: " + id));
     }
 
     public void addTopic(Topic topic) {
@@ -96,8 +98,9 @@ public class TopicService {
      * @return
      */
     public List<Topic> sortTopicsWithID() {
-        topics.sort(Comparator.comparing(Topic::getId));
-        return topics;
+        List<Topic> sorted = new ArrayList<>(topics);
+        sorted.sort(Comparator.comparing(Topic::getId));
+        return sorted;
     }
 
 
