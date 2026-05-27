@@ -1,5 +1,5 @@
-# springboot-java8
-The project is made on spring boot. The project summarize the new features present in Java 8.
+# springboot-java21
+The project is made on spring boot. The project summarize the new features present in Java 21 (and earlier, including Java 8+).
 It contain list of harcoded topics list. You can call the apis's with POSTMAN to add,delete,update Topic list
 In addition, it uses 
 1) Java 8 NIO methods 
@@ -96,31 +96,25 @@ Spring:
 
 https://spring.io/guides
 
-Java 8: 
+Java:
 
-http://www.baeldung.com/java-8-functional-interfaces
+https://docs.oracle.com/en/java/javase/21/docs/api/
 
-http://winterbe.com/posts/2015/05/22/java8-concurrency-tutorial-atomic-concurrent-map-examples/
+https://www.baeldung.com/java-8-functional-interfaces
 
-https://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html
+https://www.baeldung.com/java-streams
 
-http://winterbe.com/posts/2014/07/31/java8-stream-tutorial-examples/
+https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html
 
-http://www.oracle.com/technetwork/articles/java/ma14-java-se-8-streams-2177646.html
+https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html
 
-https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html
+https://www.baeldung.com/foreach-java
 
-https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html
+https://www.baeldung.com/java-8-comparator-comparing
 
-http://www.baeldung.com/foreach-java
+https://www.baeldung.com/java-8-sort-lambda
 
-http://winterbe.com/posts/2015/03/25/java8-examples-string-number-math-files/
-
-http://www.baeldung.com/java-8-comparator-comparing
-
-http://www.baeldung.com/java-8-sort-lambda
-
-https://dzone.com/articles/java-8-friday-goodies-new-new
+https://www.baeldung.com/java-21-new-features
 
 
 ## Built With
