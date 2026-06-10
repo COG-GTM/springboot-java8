@@ -35,9 +35,13 @@ public class Application implements CommandLineRunner {
             System.out.println(beanName);
         }
 
-        RestTemplate restTemplate =  new RestTemplate();
-        Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-        log.info(quote.toString());
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+            log.info(quote.toString());
+        } catch (Exception e) {
+            log.warn("Unable to fetch quote from external API: {}", e.getMessage());
+        }
     }
 
 
@@ -49,9 +53,13 @@ public class Application implements CommandLineRunner {
     @Bean
     public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
         return args -> {
-            Quote quote = restTemplate.getForObject(
-                    "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-            log.info(quote.toString());
+            try {
+                Quote quote = restTemplate.getForObject(
+                        "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+                log.info(quote.toString());
+            } catch (Exception e) {
+                log.warn("Unable to fetch quote from external API: {}", e.getMessage());
+            }
         };
     }
 
@@ -63,7 +71,7 @@ public class Application implements CommandLineRunner {
     public void run(String... args) throws Exception {
         log.info("Creating tables");
 
-        jdbcTemplate.execute("DROP TABLE customers IF EXISTS");
+        jdbcTemplate.execute("DROP TABLE IF EXISTS customers");
         jdbcTemplate.execute("CREATE TABLE customers(id SERIAL, first_name VARCHAR(255), last_name VARCHAR(255))");
 
         // Split up the array of whole names into an array of first/last names
