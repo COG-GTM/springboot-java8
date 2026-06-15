@@ -1,4 +1,8 @@
 # springboot-java8
+
+> **Now builds and runs on Java 11 (LTS).** The build toolchain and CI target
+> JDK 11. See [`MIGRATION_NOTES.md`](MIGRATION_NOTES.md) for migration details.
+
 The project is made on spring boot. The project summarize the new features present in Java 8.
 It contain list of harcoded topics list. You can call the apis's with POSTMAN to add,delete,update Topic list
 In addition, it uses 
@@ -76,18 +80,32 @@ GET /datetime
 
 ### Prerequisites
 
-1) Java sdk
+1) JDK 11 (e.g. Eclipse Temurin 11)
 2) POSTMAN
 
 ### Installing
 
-
-
 ```
 1) Download or clone
 2) Import the project
-3) Run on location machine
+3) Run on local machine
 4) Open Postman, to call API's (  localhost:8080 )
+```
+
+### Building & Running (JDK 11)
+
+This project can be built with either Maven or Gradle. Both target Java 11.
+
+Maven:
+```
+./mvnw clean verify          # compile, run tests, build the jar
+java -jar target/gs-spring-boot-0.1.0.jar
+```
+
+Gradle:
+```
+./gradlew clean build        # compile, run tests, build the jar
+java -jar build/libs/gs-spring-boot-0.1.0.jar
 ```
 
 
