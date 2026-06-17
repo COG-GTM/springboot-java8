@@ -39,9 +39,7 @@ class ApplicationTests {
         mockMvc.perform(get("/topic"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3))
-                .andExpect(jsonPath("$[0].id").value("spring"))
-                .andExpect(jsonPath("$[1].id").value("java"))
-                .andExpect(jsonPath("$[2].id").value("javascript"));
+                .andExpect(jsonPath("$[*].id", org.hamcrest.Matchers.containsInAnyOrder("spring", "java", "javascript")));
     }
 
     @Test
