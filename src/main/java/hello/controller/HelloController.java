@@ -29,10 +29,7 @@ public class HelloController {
             "Select ID With \"Java\" Keyword," +
             " Then Sort Then Join ";
     String findIdHavingCharacterTemplate = "-------------Return All ID having character \'g\' in it:  ";
-    String findAllFilesInPathAndSortTemplate = "---------Find all files in path and sort:    ";
-    String findParticularFileInPathAndSortTemplate = "----------Find File in present directory which strats with \"grad\",provided maximum depth=25 and sort : ";
-    String findParticularFileInPathAndSortWithWalkFunctionTemplate = "----------Find File in present directory which strats with \"grad\",provided maximum depth=25 and sort :  with walk function";
-    String readFileWithStreamFunctionTemplate = "---------Read \"temp.txt\" file with stream functions, having \"print\" witin it:  ";
+
 
 
     @Autowired
@@ -80,21 +77,7 @@ public class HelloController {
     }
 
 
-    /**
-     * File Operation in Java 8
-     * @return
-     */
-    @RequestMapping("/topic/file/operation")
-    public String showFileOperation() {
-        String findAllFilesInPathAndSort = topicService.findAllFilesInPathAndSort();
-        String findParticularFileInPathAndSort = topicService.findParticularFileInPathAndSort();
-        String findParticularFileInPathAndSortWithWalkFunction = topicService.findParticularFileInPathAndSortWithWalkFunction();
-        String readFileWithStreamFunction = topicService.readFileWithStreamFunction();
-        return findAllFilesInPathAndSortTemplate + findAllFilesInPathAndSort
-                + findParticularFileInPathAndSortTemplate + findParticularFileInPathAndSort
-                + findParticularFileInPathAndSortWithWalkFunctionTemplate + findParticularFileInPathAndSortWithWalkFunction
-                + readFileWithStreamFunctionTemplate + readFileWithStreamFunction;
-    }
+
 
 
 

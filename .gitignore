@@ -1,1 +1,7 @@
 /.idea/
+*.iml
+target/
+*.class
+*.jar
+*.log
+/application.properties
