@@ -36,7 +36,7 @@ public class Application implements CommandLineRunner {
         }
 
         RestTemplate restTemplate =  new RestTemplate();
-        Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+        Quote quote = restTemplate.getForObject("https://gturnquist-quoters.cfapps.io/api/random", Quote.class);
         log.info(quote.toString());
     }
 
@@ -50,7 +50,7 @@ public class Application implements CommandLineRunner {
     public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
         return args -> {
             Quote quote = restTemplate.getForObject(
-                    "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+                    "https://gturnquist-quoters.cfapps.io/api/random", Quote.class);
             log.info(quote.toString());
         };
     }

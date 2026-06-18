@@ -3,8 +3,10 @@ package hello.controller;
 import hello.model.Topic;
 import hello.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -29,8 +31,12 @@ public class TopicController {
      * @return
      */
     @RequestMapping("/topic/{id}")
-    public Topic getTopicWithID(@PathVariable String id) {
-        return topicService.getTopicWithId(id);
+    public ResponseEntity<Topic> getTopicWithID(@PathVariable String id) {
+        Topic topic = topicService.getTopicWithId(id);
+        if (topic == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(topic);
     }
 
     /**
@@ -38,7 +44,7 @@ public class TopicController {
      * @param topic
      */
     @RequestMapping(method = RequestMethod.POST, value = "/topic")
-    public void addTopic(@RequestBody Topic topic) {
+    public void addTopic(@Valid @RequestBody Topic topic) {
         topicService.addTopic(topic);
     }
 
@@ -48,7 +54,7 @@ public class TopicController {
      * @param topic
      */
     @RequestMapping(method = RequestMethod.PUT, value = "/topic/{id}")
-    public void updateTopic(@PathVariable String id, @RequestBody Topic topic) {
+    public void updateTopic(@PathVariable String id, @Valid @RequestBody Topic topic) {
         topicService.updateTopic(id, topic);
     }
 
