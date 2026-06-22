@@ -2,89 +2,116 @@ package hello.controller;
 
 import hello.model.Topic;
 import hello.service.TopicService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
 
-@RestController
+@Path("/topic")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class TopicController {
 
-    @Autowired
-    private TopicService topicService;
+    @Inject
+    TopicService topicService;
 
-
-    /**
-     * Get all Topic
-     * @return
-     */
-    @RequestMapping("/topic")
+    @GET
     public List<Topic> getAllTopics() {
         return topicService.getAllTopics();
     }
 
-    /**
-     * get Topic with ID
-     * @param id
-     * @return
-     */
-    @RequestMapping("/topic/{id}")
-    public Topic getTopicWithID(@PathVariable String id) {
+    @GET
+    @Path("/{id}")
+    public Topic getTopicWithID(@PathParam("id") String id) {
         return topicService.getTopicWithId(id);
     }
 
-    /**
-     * Add a new topic in list
-     * @param topic
-     */
-    @RequestMapping(method = RequestMethod.POST, value = "/topic")
-    public void addTopic(@RequestBody Topic topic) {
+    @POST
+    public void addTopic(Topic topic) {
         topicService.addTopic(topic);
     }
 
-    /**
-     * Update Topic in List with id
-     * @param id
-     * @param topic
-     */
-    @RequestMapping(method = RequestMethod.PUT, value = "/topic/{id}")
-    public void updateTopic(@PathVariable String id, @RequestBody Topic topic) {
+    @PUT
+    @Path("/{id}")
+    public void updateTopic(@PathParam("id") String id, Topic topic) {
         topicService.updateTopic(id, topic);
     }
 
-
-    /**
-     * Delete a topic with ID
-     * @param id
-     */
-    @RequestMapping(method = RequestMethod.DELETE, value = "/topic/{id}")
-    public void deleteTopic(@PathVariable String id) {
+    @DELETE
+    @Path("/{id}")
+    public void deleteTopic(@PathParam("id") String id) {
         topicService.deleteTopic(id);
     }
 
-    /**
-     * Get all topics with Id length greater then minimum length
-     * @param minLength
-     * @return
-     */
-    @RequestMapping(value = "/topic/minimum/length/{minLength}")
-    public List<Topic> filterMinimumLengthForId(@PathVariable Integer minLength) {
+    @GET
+    @Path("/minimum/length/{minLength}")
+    public List<Topic> filterMinimumLengthForId(@PathParam("minLength") Integer minLength) {
         return topicService.filterMinimumLengthForId(minLength);
     }
 
-
-    /**
-     * Sort with Id
-     * @return
-     */
-    @RequestMapping("/topic/sort")
+    @GET
+    @Path("/sort")
     public List<Topic> sortTopicsWithID() {
         return topicService.sortTopicsWithID();
     }
 
+    private static final String joinTemplate = "Joining All String ID's with JOIN method: ";
+    private static final String makeDistinctAndSortCharactersTemplate = "-------------Get all ID characters, select distict and sort with ID=   ";
+    private static final String splitAllIdWithColonSelectIDWithJavaKeywordThenSortThenJoinTemplate = "-------------Split All Id With Colon," +
+            "Select ID With \"Java\" Keyword," +
+            " Then Sort Then Join ";
+    private static final String findIdHavingCharacterTemplate = "-------------Return All ID having character 'g' in it:  ";
+    private static final String findAllFilesInPathAndSortTemplate = "---------Find all files in path and sort:    ";
+    private static final String findParticularFileInPathAndSortTemplate = "----------Find File in present directory which strats with \"grad\",provided maximum depth=25 and sort : ";
+    private static final String findParticularFileInPathAndSortWithWalkFunctionTemplate = "----------Find File in present directory which strats with \"grad\",provided maximum depth=25 and sort :  with walk function";
+    private static final String readFileWithStreamFunctionTemplate = "---------Read \"temp.txt\" file with stream functions, having \"print\" witin it:  ";
 
+    /**
+     * String Operations in Java 8
+     *
+     * @return
+     */
+    @GET
+    @Path("/string/operation")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String showStringOperation() {
 
+        String join = topicService.returnAllTopicIDWithStringSlicing();
+        String makeDistinctAndSortCharacters = topicService.makeDistinctAndSortCharacters(join);
+        String splitAllIdWithColonSelectIDWithJavaKeywordThenSortThenJoin = topicService
+                .splitAllIdWithColonSelectIDWithJavaKeywordThenSortThenJoin(join);
+        String findIdHavingCharacter = topicService.findIdHavingCharacter();
 
+        return joinTemplate + join
+                + makeDistinctAndSortCharactersTemplate + makeDistinctAndSortCharacters
+                + splitAllIdWithColonSelectIDWithJavaKeywordThenSortThenJoinTemplate + splitAllIdWithColonSelectIDWithJavaKeywordThenSortThenJoin
+                + findIdHavingCharacterTemplate + findIdHavingCharacter;
 
+    }
 
+    /**
+     * File Operation in Java 8
+     * @return
+     */
+    @GET
+    @Path("/file/operation")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String showFileOperation() {
+        String findAllFilesInPathAndSort = topicService.findAllFilesInPathAndSort();
+        String findParticularFileInPathAndSort = topicService.findParticularFileInPathAndSort();
+        String findParticularFileInPathAndSortWithWalkFunction = topicService.findParticularFileInPathAndSortWithWalkFunction();
+        String readFileWithStreamFunction = topicService.readFileWithStreamFunction();
+        return findAllFilesInPathAndSortTemplate + findAllFilesInPathAndSort
+                + findParticularFileInPathAndSortTemplate + findParticularFileInPathAndSort
+                + findParticularFileInPathAndSortWithWalkFunctionTemplate + findParticularFileInPathAndSortWithWalkFunction
+                + readFileWithStreamFunctionTemplate + readFileWithStreamFunction;
+    }
 }

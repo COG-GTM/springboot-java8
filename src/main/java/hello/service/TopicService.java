@@ -2,7 +2,7 @@ package hello.service;
 
 import hello.declaration.CustomPredicate;
 import hello.model.Topic;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-@Service
+@ApplicationScoped
 public class TopicService {
 
 
