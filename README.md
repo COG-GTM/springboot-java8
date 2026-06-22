@@ -1,8 +1,13 @@
-# springboot-java8
-The project is made on spring boot. The project summarize the new features present in Java 8.
-It contain list of harcoded topics list. You can call the apis's with POSTMAN to add,delete,update Topic list
-In addition, it uses 
-1) Java 8 NIO methods 
+# springboot-java8 (migrated to Quarkus)
+
+Originally a Spring Boot reference app demonstrating Java 8 features, this project has been
+migrated to [Quarkus](https://quarkus.io/) 3.x running on Java 17+. It still showcases the
+same Java features and exposes the same REST endpoints for topic management and functional
+programming examples.
+
+It contains a hardcoded list of topics. You can call the APIs (e.g. with POSTMAN or curl) to
+add, delete, and update the topic list. In addition, it uses:
+1) Java 8 NIO methods
 2) String operations
 3) Stream operations
 4) IntStream functions
@@ -14,13 +19,31 @@ In addition, it uses
 10) Java 8 LocalDateTime API
 11) Pattern
 
+## Prerequisites
 
+1) Java 17+ (JDK)
+2) Maven (or use the bundled `./mvnw` wrapper)
+3) POSTMAN / curl to call the APIs
 
 ## Getting Started
-1) Download or clone the project with link 
-(https://github.com/RehmanMuradAli/springboot-java8/)
 
-## Available API's
+Run in Quarkus dev mode (live reload):
+```
+./mvnw quarkus:dev
+```
+
+Build the runnable application:
+```
+./mvnw package
+```
+This produces the runner under `target/quarkus-app/`. Run it with:
+```
+java -jar target/quarkus-app/quarkus-run.jar
+```
+
+The application listens on `localhost:8080`.
+
+## Available APIs
 
 Greetings
 ```
@@ -34,7 +57,6 @@ Get Topic of given ID
 ```
 GET /topic/{id}
 ```
-
 Add Topic in List
 ```
 POST /topic
@@ -47,22 +69,18 @@ Delete Topic of given ID
 ```
 DELETE /topic/{id}
 ```
-
 Get all Topics whose ID's length is greater than minLength
 ```
 GET /topic/minimum/length/{minLength}
 ```
-
 Get all Topics sorted by ID
 ```
 GET /topic/sort
 ```
-
 String Operations on Topic List
 ```
 GET /topic/string/operation
 ```
-
 File Operations on Topic List
 ```
 GET /topic/file/operation
@@ -72,63 +90,29 @@ Java 8 Date Time example
 GET /datetime
 ```
 
-
-
-### Prerequisites
-
-1) Java sdk
-2) POSTMAN
-
-### Installing
-
-
-
-```
-1) Download or clone
-2) Import the project
-3) Run on location machine
-4) Open Postman, to call API's (  localhost:8080 )
-```
-
-
 ## Helpful Links
-Spring:
 
-https://spring.io/guides
+Quarkus:
 
-Java 8: 
+https://quarkus.io/guides/
 
-http://www.baeldung.com/java-8-functional-interfaces
+https://quarkus.io/guides/rest
 
-http://winterbe.com/posts/2015/05/22/java8-concurrency-tutorial-atomic-concurrent-map-examples/
+https://quarkus.io/guides/datasource
 
-https://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html
+Java 8:
 
-http://winterbe.com/posts/2014/07/31/java8-stream-tutorial-examples/
-
-http://www.oracle.com/technetwork/articles/java/ma14-java-se-8-streams-2177646.html
-
-https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html
+https://www.baeldung.com/java-8-functional-interfaces
 
 https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html
 
-http://www.baeldung.com/foreach-java
-
-http://winterbe.com/posts/2015/03/25/java8-examples-string-number-math-files/
-
-http://www.baeldung.com/java-8-comparator-comparing
-
-http://www.baeldung.com/java-8-sort-lambda
-
-https://dzone.com/articles/java-8-friday-goodies-new-new
-
+https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html
 
 ## Built With
 
 * [Maven](https://maven.apache.org/) - Dependency Management
+* [Quarkus](https://quarkus.io/) - Supersonic Subatomic Java framework
 
 ## Authors
 
-* **Rehman Murad Ali** 
-
-
+* **Rehman Murad Ali**
