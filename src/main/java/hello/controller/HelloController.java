@@ -6,7 +6,7 @@ import hello.model.Topic;
 import hello.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,7 +43,7 @@ public class HelloController {
      *
      * @return
      */
-    @RequestMapping("/datetime")
+    @GetMapping("/datetime")
     public String index() {
         TimeClient myTimeClient = new SimpleTimeClient();
         LocalDateTime localDateTime = LocalDateTime.now();
@@ -63,7 +63,7 @@ public class HelloController {
      *
      * @return
      */
-    @RequestMapping("/topic/string/operation")
+    @GetMapping("/topic/string/operation")
     public String showStringOperation() {
 
         String join = topicService.returnAllTopicIDWithStringSlicing();
@@ -84,7 +84,7 @@ public class HelloController {
      * File Operation in Java 8
      * @return
      */
-    @RequestMapping("/topic/file/operation")
+    @GetMapping("/topic/file/operation")
     public String showFileOperation() {
         String findAllFilesInPathAndSort = topicService.findAllFilesInPathAndSort();
         String findParticularFileInPathAndSort = topicService.findParticularFileInPathAndSort();
