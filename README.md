@@ -76,7 +76,7 @@ GET /datetime
 
 ### Prerequisites
 
-1) Java sdk
+1) Java 11 SDK (or higher)
 2) POSTMAN
 
 ### Installing
