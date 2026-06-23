@@ -1,1 +1,10 @@
 /.idea/
+
+# Build output
+/target/
+/build/
+/.gradle/
+
+# OS / editor
+*.iml
+.DS_Store

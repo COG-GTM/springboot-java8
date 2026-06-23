@@ -1,6 +1,7 @@
 # springboot-java8
-The project is made on spring boot. The project summarize the new features present in Java 8.
-It contain list of harcoded topics list. You can call the apis's with POSTMAN to add,delete,update Topic list
+The project is made on Spring Boot. It summarizes the new features introduced in Java 8,
+now demonstrated on a modern runtime: **Java 21** and **Spring Boot 3.5.x**.
+It contains a hardcoded list of topics. You can call the APIs (e.g. with POSTMAN or curl) to add, delete, and update the topic list.
 In addition, it uses 
 1) Java 8 NIO methods 
 2) String operations
@@ -17,8 +18,19 @@ In addition, it uses
 
 
 ## Getting Started
-1) Download or clone the project with link 
-(https://github.com/RehmanMuradAli/springboot-java8/)
+1) Clone the project:
+```
+git clone https://github.com/COG-GTM/springboot-java8.git
+```
+2) Build and run with the Maven wrapper:
+```
+./mvnw spring-boot:run
+```
+   or with the Gradle wrapper:
+```
+./gradlew bootRun
+```
+The application starts on `http://localhost:8080`.
 
 ## Available API's
 
@@ -76,18 +88,26 @@ GET /datetime
 
 ### Prerequisites
 
-1) Java sdk
-2) POSTMAN
+1) Java 21 (JDK 21)
+2) Maven 3.9+ or Gradle 8.x (wrappers are included, so a local install is optional)
+3) POSTMAN or curl (optional, to call the APIs)
 
 ### Installing
 
+```
+1) Clone the repository
+2) Build/run with ./mvnw spring-boot:run (or ./gradlew bootRun)
+3) Open Postman or curl to call the APIs ( localhost:8080 )
+```
 
+### Running the tests
 
 ```
-1) Download or clone
-2) Import the project
-3) Run on location machine
-4) Open Postman, to call API's (  localhost:8080 )
+./mvnw test
+```
+or
+```
+./gradlew test
 ```
 
 
@@ -98,34 +118,32 @@ https://spring.io/guides
 
 Java 8: 
 
-http://www.baeldung.com/java-8-functional-interfaces
+https://www.baeldung.com/java-8-functional-interfaces
 
 http://winterbe.com/posts/2015/05/22/java8-concurrency-tutorial-atomic-concurrent-map-examples/
 
 https://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html
 
-http://winterbe.com/posts/2014/07/31/java8-stream-tutorial-examples/
-
-http://www.oracle.com/technetwork/articles/java/ma14-java-se-8-streams-2177646.html
-
 https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html
 
 https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html
 
-http://www.baeldung.com/foreach-java
+https://www.baeldung.com/foreach-java
 
 http://winterbe.com/posts/2015/03/25/java8-examples-string-number-math-files/
 
-http://www.baeldung.com/java-8-comparator-comparing
+https://www.baeldung.com/java-8-comparator-comparing
 
-http://www.baeldung.com/java-8-sort-lambda
+https://www.baeldung.com/java-8-sort-lambda
 
 https://dzone.com/articles/java-8-friday-goodies-new-new
 
 
 ## Built With
 
-* [Maven](https://maven.apache.org/) - Dependency Management
+* [Java 21](https://www.oracle.com/java/) - Language / runtime
+* [Spring Boot 3.5.x](https://spring.io/projects/spring-boot) - Application framework
+* [Maven](https://maven.apache.org/) / [Gradle](https://gradle.org/) - Build & dependency management
 
 ## Authors
 
