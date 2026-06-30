@@ -3,6 +3,7 @@ package hello.controller;
 import hello.model.Topic;
 import hello.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,8 +30,12 @@ public class TopicController {
      * @return
      */
     @RequestMapping("/topic/{id}")
-    public Topic getTopicWithID(@PathVariable String id) {
-        return topicService.getTopicWithId(id);
+    public ResponseEntity<Topic> getTopicWithID(@PathVariable String id) {
+        Topic topic = topicService.getTopicWithId(id);
+        if (topic == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(topic);
     }
 
     /**

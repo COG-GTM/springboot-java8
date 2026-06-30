@@ -36,7 +36,7 @@ public class TopicService {
      * @return
      */
     public Topic getTopicWithId(String id) {
-        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst().get();
+        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst().orElse(null);
     }
 
     public void addTopic(Topic topic) {
