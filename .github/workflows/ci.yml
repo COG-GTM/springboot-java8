@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-test:
+    name: Build, test and report coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Run tests with coverage
+        run: ./gradlew clean test jacocoTestReport jacocoTestCoverageVerification --no-daemon --stacktrace
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          REPORT=build/reports/jacoco/test/jacocoTestReport.csv
+          if [ -f "$REPORT" ]; then
+            awk -F, 'NR>1 { lm += $8; lc += $9 } END {
+              total = lm + lc;
+              pct = (total > 0) ? lc * 100 / total : 0;
+              printf "## JaCoCo coverage\n\n| Metric | Value |\n|---|---|\n| Lines covered | %d / %d |\n| Line coverage | %.2f%% |\n", lc, total, pct
+            }' "$REPORT" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No JaCoCo report found." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/reports/tests/test
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-coverage-report
+          path: build/reports/jacoco/test
