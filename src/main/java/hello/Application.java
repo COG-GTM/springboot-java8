@@ -16,6 +16,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
@@ -44,8 +45,8 @@ public class Application implements CommandLineRunner {
         try {
             Quote quote = restTemplate.getForObject(QUOTE_URL, Quote.class);
             log.info(String.valueOf(quote));
-        } catch (RuntimeException e) {
-            log.warn("Could not fetch a quote from {}: {}", QUOTE_URL, e.getMessage());
+        } catch (RestClientException e) {
+            log.warn("Could not fetch a quote from {}", QUOTE_URL, e);
         }
     }
 
