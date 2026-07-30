@@ -17,8 +17,23 @@ In addition, it uses
 
 
 ## Getting Started
+
+Requires a locally installed JDK 17 (the Gradle build pins a Java 17 toolchain and no toolchain resolver is configured, so it will not download one).
+
 1) Download or clone the project with link 
 (https://github.com/RehmanMuradAli/springboot-java8/)
+
+2) Build and run with Maven
+```
+./mvnw clean package
+java -jar target/gs-spring-boot-0.1.0.jar
+```
+
+or with Gradle
+```
+./gradlew clean bootJar
+java -jar build/libs/gs-spring-boot-0.1.0.jar
+```
 
 ## Available API's
 
@@ -76,7 +91,7 @@ GET /datetime
 
 ### Prerequisites
 
-1) Java sdk
+1) JDK 17
 2) POSTMAN
 
 ### Installing
@@ -126,6 +141,7 @@ https://dzone.com/articles/java-8-friday-goodies-new-new
 ## Built With
 
 * [Maven](https://maven.apache.org/) - Dependency Management
+* [Gradle](https://gradle.org/) - Alternative build, kept in sync with the Maven build
 
 ## Authors
 
