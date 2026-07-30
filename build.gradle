@@ -10,9 +10,8 @@ group = 'org.springframework'
 version = '0.1.0'
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 bootJar {
@@ -28,7 +27,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     runtimeOnly 'com.h2database:h2'
-    runtimeOnly 'org.springframework.boot:spring-boot-properties-migrator'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
