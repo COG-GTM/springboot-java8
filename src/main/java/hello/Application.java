@@ -36,8 +36,12 @@ public class Application implements CommandLineRunner {
         }
 
         RestTemplate restTemplate =  new RestTemplate();
-        Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-        log.info(quote.toString());
+        try {
+            Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+            log.info(String.valueOf(quote));
+        } catch (Exception e) {
+            log.warn("Could not fetch random quote: {}", e.getMessage());
+        }
     }
 
 
@@ -49,9 +53,13 @@ public class Application implements CommandLineRunner {
     @Bean
     public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
         return args -> {
-            Quote quote = restTemplate.getForObject(
-                    "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-            log.info(quote.toString());
+            try {
+                Quote quote = restTemplate.getForObject(
+                        "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+                log.info(String.valueOf(quote));
+            } catch (Exception e) {
+                log.warn("Could not fetch random quote: {}", e.getMessage());
+            }
         };
     }
 
