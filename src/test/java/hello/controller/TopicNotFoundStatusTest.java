@@ -1,6 +1,5 @@
 package hello.controller;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,10 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * MockMvc rethrows unhandled exceptions instead of running the error dispatch, so this one case is
  * driven over a real connection.
  *
- * <p>{@code TopicService.getTopicWithId} calls {@code Optional.get()} on a miss, which throws
- * {@link java.util.NoSuchElementException} and surfaces as HTTP 500. That is asserted here as the
- * <em>current</em> behaviour; the disabled test below is the replacement for when a parallel change
- * turns the miss into a proper 404.
+ * <p>{@code TopicService.getTopicWithId} returns an empty {@link java.util.Optional} on a miss, which
+ * the controller translates into a 404.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TopicNotFoundStatusTest {
@@ -27,15 +24,7 @@ class TopicNotFoundStatusTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    void unknownTopicIdCurrentlyReturnsInternalServerError() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/topic/does-not-exist", String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Test
-    @Disabled("Enable, and delete unknownTopicIdCurrentlyReturnsInternalServerError, once an unknown id is a 404")
-    void unknownTopicIdShouldReturnNotFound() {
+    void unknownTopicIdReturnsNotFound() {
         ResponseEntity<String> response = restTemplate.getForEntity("/topic/does-not-exist", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);

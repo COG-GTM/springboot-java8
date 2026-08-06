@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import hello.controller.GreetingController;
 import hello.controller.HelloController;
@@ -36,7 +36,7 @@ class ApplicationContextLoadTest {
         assertThat(context.getBean(TopicController.class)).isNotNull();
         assertThat(context.getBean(HelloController.class)).isNotNull();
         assertThat(context.getBean(GreetingController.class)).isNotNull();
-        assertThat(context.getBean(RestTemplate.class)).isNotNull();
+        assertThat(context.getBean(RestClient.class)).isNotNull();
         assertThat(context.getBean(JdbcTemplate.class)).isNotNull();
     }
 

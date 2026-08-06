@@ -37,7 +37,7 @@ class TopicServiceTest {
      * records only has to touch one line in this class.
      */
     private static List<String> idsOf(List<Topic> topics) {
-        return topics.stream().map(Topic::getId).collect(Collectors.toList());
+        return topics.stream().map(Topic::id).collect(Collectors.toList());
     }
 
     @Test
@@ -48,26 +48,16 @@ class TopicServiceTest {
 
     @Test
     void getTopicWithIdReturnsTheMatchingTopic() {
-        Topic topic = topicService.getTopicWithId("java");
+        Topic topic = topicService.getTopicWithId("java").orElseThrow();
 
         assertThat(idsOf(List.of(topic))).containsExactly("java");
-        assertThat(topic.getSubjectName()).isEqualTo("Core Java");
+        assertThat(topic.subjectName()).isEqualTo("Core Java");
     }
 
     @Test
-    void getTopicWithIdThrowsForAnUnknownId() {
-        // Current behaviour: Optional.get() on an empty Optional. Over HTTP this surfaces as a 500.
-        assertThatThrownBy(() -> topicService.getTopicWithId("does-not-exist"))
-                .isInstanceOf(NoSuchElementException.class);
-    }
-
-    @Test
-    @Disabled("Enable together with the parallel change that makes an unknown id a proper 404")
-    void getTopicWithIdShouldReportAMissingTopicWithoutThrowing() {
-        // Replacement for getTopicWithIdThrowsForAnUnknownId once the service returns an empty
-        // Optional (or the controller translates the miss into HTTP 404).
-        assertThatCode(() -> topicService.getTopicWithId("does-not-exist"))
-                .doesNotThrowAnyException();
+    void getTopicWithIdReportsAMissingTopicWithoutThrowing() {
+        assertThatCode(() -> topicService.getTopicWithId("does-not-exist")).doesNotThrowAnyException();
+        assertThat(topicService.getTopicWithId("does-not-exist")).isEmpty();
     }
 
     @Test
@@ -83,7 +73,7 @@ class TopicServiceTest {
 
         List<Topic> topics = topicService.getAllTopics();
         assertThat(idsOf(topics)).containsExactly("spring", "java", "javascript");
-        assertThat(topics.get(1).getSubjectName()).isEqualTo("Updated Java");
+        assertThat(topics.get(1).subjectName()).isEqualTo("Updated Java");
     }
 
     @Test
