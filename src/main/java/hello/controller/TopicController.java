@@ -18,7 +18,7 @@ public class TopicController {
      * Get all Topic
      * @return
      */
-    @RequestMapping("/topic")
+    @GetMapping("/topic")
     public List<Topic> getAllTopics() {
         return topicService.getAllTopics();
     }
@@ -28,7 +28,7 @@ public class TopicController {
      * @param id
      * @return
      */
-    @RequestMapping("/topic/{id}")
+    @GetMapping("/topic/{id}")
     public Topic getTopicWithID(@PathVariable String id) {
         return topicService.getTopicWithId(id);
     }
@@ -37,7 +37,7 @@ public class TopicController {
      * Add a new topic in list
      * @param topic
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/topic")
+    @PostMapping("/topic")
     public void addTopic(@RequestBody Topic topic) {
         topicService.addTopic(topic);
     }
@@ -47,7 +47,7 @@ public class TopicController {
      * @param id
      * @param topic
      */
-    @RequestMapping(method = RequestMethod.PUT, value = "/topic/{id}")
+    @PutMapping("/topic/{id}")
     public void updateTopic(@PathVariable String id, @RequestBody Topic topic) {
         topicService.updateTopic(id, topic);
     }
@@ -57,7 +57,7 @@ public class TopicController {
      * Delete a topic with ID
      * @param id
      */
-    @RequestMapping(method = RequestMethod.DELETE, value = "/topic/{id}")
+    @DeleteMapping("/topic/{id}")
     public void deleteTopic(@PathVariable String id) {
         topicService.deleteTopic(id);
     }
@@ -67,7 +67,7 @@ public class TopicController {
      * @param minLength
      * @return
      */
-    @RequestMapping(value = "/topic/minimum/length/{minLength}")
+    @GetMapping("/topic/minimum/length/{minLength}")
     public List<Topic> filterMinimumLengthForId(@PathVariable Integer minLength) {
         return topicService.filterMinimumLengthForId(minLength);
     }
@@ -77,7 +77,7 @@ public class TopicController {
      * Sort with Id
      * @return
      */
-    @RequestMapping("/topic/sort")
+    @GetMapping("/topic/sort")
     public List<Topic> sortTopicsWithID() {
         return topicService.sortTopicsWithID();
     }
