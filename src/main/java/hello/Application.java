@@ -16,12 +16,15 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
+
+    private static final String QUOTE_URL = "http://gturnquist-quoters.cfapps.io/api/random";
 
     public static void main(String[] args) {
 
@@ -35,9 +38,16 @@ public class Application implements CommandLineRunner {
             System.out.println(beanName);
         }
 
-        RestTemplate restTemplate =  new RestTemplate();
-        Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-        log.info(quote.toString());
+        logRandomQuote(new RestTemplate());
+    }
+
+    private static void logRandomQuote(RestTemplate restTemplate) {
+        try {
+            Quote quote = restTemplate.getForObject(QUOTE_URL, Quote.class);
+            log.info(String.valueOf(quote));
+        } catch (RestClientException e) {
+            log.warn("Could not fetch a quote from {}: {}", QUOTE_URL, e.getMessage());
+        }
     }
 
 
@@ -47,12 +57,8 @@ public class Application implements CommandLineRunner {
     }
 
     @Bean
-    public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
-        return args -> {
-            Quote quote = restTemplate.getForObject(
-                    "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-            log.info(quote.toString());
-        };
+    public CommandLineRunner run(RestTemplate restTemplate) {
+        return args -> logRandomQuote(restTemplate);
     }
 
 
@@ -80,8 +86,9 @@ public class Application implements CommandLineRunner {
 
         log.info("Querying for customer records where first_name = 'Josh':");
         jdbcTemplate.query(
-                "SELECT id, first_name, last_name FROM customers WHERE first_name = ?", new Object[]{"Josh"},
-                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
+                "SELECT id, first_name, last_name FROM customers WHERE first_name = ?",
+                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name")),
+                "Josh"
         ).forEach(customer -> log.info(customer.toString()));
 
     }
