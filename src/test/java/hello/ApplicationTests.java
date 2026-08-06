@@ -11,10 +11,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ApplicationTests {
 
     @Autowired
+    private Application application;
+
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Test
     void contextLoads() {
         assertThat(jdbcTemplate.queryForObject("SELECT 1", Integer.class)).isEqualTo(1);
+    }
+
+    @Test
+    void commandLineRunnerPopulatesCustomers() throws Exception {
+        application.run();
+
+        assertThat(jdbcTemplate.queryForObject("SELECT count(*) FROM customers", Integer.class)).isEqualTo(4);
     }
 }
