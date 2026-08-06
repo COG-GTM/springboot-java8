@@ -1,134 +1,150 @@
 # springboot-java8
-The project is made on spring boot. The project summarize the new features present in Java 8.
-It contain list of harcoded topics list. You can call the apis's with POSTMAN to add,delete,update Topic list
-In addition, it uses 
-1) Java 8 NIO methods 
-2) String operations
-3) Stream operations
-4) IntStream functions
-5) Functional interface
-6) Lambda functions
-7) Optional datatype
-8) Foreach loops
-9) Default and Static methods in interface
-10) Java 8 LocalDateTime API
-11) Pattern
 
+A small Spring Boot REST service whose purpose is to **demonstrate Java language features** — originally the Java 8
+feature set, which is still what the code shows off. The name stuck, but the project itself now builds and runs on
+**Java 21 with Spring Boot 3.5.16**.
 
+The domain is deliberately trivial: an in-memory, hardcoded list of `Topic` objects that you can create, read, update
+and delete over HTTP, plus a few endpoints that exist purely to print the result of stream / string / file operations.
 
-## Getting Started
-1) Download or clone the project with link 
-(https://github.com/RehmanMuradAli/springboot-java8/)
+## Java 8 features demonstrated
 
-## Available API's
+1. NIO.2 file APIs (`Files.list`, `Files.find`, `Files.walk`, `Files.newBufferedReader`)
+2. String operations (`String.join`, `String.chars`)
+3. Stream operations (`filter`, `map`, `sorted`, `Collectors.joining`)
+4. `IntStream` (`IntStream.range` for index lookups)
+5. Functional interfaces (`CustomPredicate<T>`)
+6. Lambda expressions
+7. `Optional` / `OptionalInt`
+8. `forEach` loops
+9. `default` and `static` methods on interfaces (`TimeClient`)
+10. The `java.time` API (`LocalDateTime`, `ZonedDateTime`, `ChronoUnit`)
+11. `Pattern` as a stream source and as a predicate (`splitAsStream`, `asPredicate`)
+12. try-with-resources over streams of paths
 
-Greetings
-```
-GET /
-```
-Get all Topics in List
-```
-GET /topic
-```
-Get Topic of given ID
-```
-GET /topic/{id}
-```
+## Java 21 idioms in use
 
-Add Topic in List
-```
-POST /topic
-```
-Update Topic of given ID
-```
-PUT /topic/{id}
-```
-Delete Topic of given ID
-```
-DELETE /topic/{id}
-```
+The application was migrated from Spring Boot 2.0.2 / Java 8 to Spring Boot 3.5.16 / Java 21, and the presentation
+layer has been rewritten to use the modern language features that replace what the old code did by hand:
 
-Get all Topics whose ID's length is greater than minLength
-```
-GET /topic/minimum/length/{minLength}
+- **Text blocks** (Java 15) for the multi-part responses of `/datetime`, `/topic/string/operation` and
+  `/topic/file/operation`, using `\` line-continuation escapes so the responses stay on a single line.
+- **`String.formatted(...)`** (Java 15) instead of `String.format(...)` and `+` concatenation.
+- Label templates are `private static final` constants rather than mutable instance fields.
+
+## Requirements
+
+- JDK 21 (the build sets `<java.version>21</java.version>`)
+- Maven is **not** required — use the bundled Maven Wrapper (`./mvnw`, Maven 3.9.9)
+- `curl`, HTTPie or Postman to call the API
+
+## Getting started
+
+```bash
+git clone https://github.com/COG-GTM/springboot-java8.git
+cd springboot-java8
+
+# compile, run the test suite and package the jar
+./mvnw clean verify
+
+# run the application (listens on http://localhost:8080)
+./mvnw spring-boot:run
 ```
 
-Get all Topics sorted by ID
-```
-GET /topic/sort
-```
+You can also run the packaged jar directly:
 
-String Operations on Topic List
-```
-GET /topic/string/operation
+```bash
+java -jar target/gs-spring-boot-0.1.0.jar
 ```
 
-File Operations on Topic List
+> The Gradle build has been removed; Maven is the only supported build.
+
+Every push and pull request is built by GitHub Actions with `./mvnw -B clean verify` on JDK 21
+(see `.github/workflows/ci.yml`).
+
+### Expected startup noise
+
+- On startup the app creates an in-memory **H2** `customers` table with `JdbcTemplate` and logs a few rows — this is
+  part of the demo, not an error.
+- It also tries to fetch a random quote from `gturnquist-quoters.cfapps.io`, a demo service that no longer exists.
+  The resulting `WARN Could not fetch a quote from ...` is expected and must never fail startup.
+
+## API
+
+All endpoints are served from `http://localhost:8080`.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/` | Greeting; accepts an optional `?name=` parameter (defaults to `World`) |
+| `GET` | `/topic` | All topics |
+| `GET` | `/topic/{id}` | A single topic by id |
+| `POST` | `/topic` | Add a topic (JSON body) |
+| `PUT` | `/topic/{id}` | Replace the topic with the given id |
+| `DELETE` | `/topic/{id}` | Delete the topic with the given id |
+| `GET` | `/topic/sort` | All topics sorted by id |
+| `GET` | `/topic/minimum/length/{minLength}` | Topics whose id is longer than `minLength` |
+| `GET` | `/topic/string/operation` | Plain-text dump of the string/stream/regex examples |
+| `GET` | `/topic/file/operation` | Plain-text dump of the NIO.2 file examples |
+| `GET` | `/datetime` | Plain-text dump of the `java.time` examples |
+
+The topic list lives in memory, so `POST` / `PUT` / `DELETE` changes are lost when the application restarts.
+
+### Examples
+
+```bash
+$ curl 'http://localhost:8080/?name=Devin'
+{"id":1,"content":"Hello, Devin!"}
+
+$ curl http://localhost:8080/topic
+[{"id":"spring","subjectName":"Spring Framework","subjectDescription":"Spring Framework Description"}, ...]
+
+$ curl -X POST http://localhost:8080/topic \
+    -H 'Content-Type: application/json' \
+    -d '{"id":"kotlin","subjectName":"Kotlin","subjectDescription":"Kotlin Description"}'
 ```
-GET /topic/file/operation
-```
-Java 8 Date Time example
-```
-GET /datetime
-```
 
+The `/topic/file/operation` endpoint resolves paths relative to the working directory the application was started
+from, so its output depends on where you run it.
 
-
-### Prerequisites
-
-1) Java sdk
-2) POSTMAN
-
-### Installing
-
-
+## Project layout
 
 ```
-1) Download or clone
-2) Import the project
-3) Run on location machine
-4) Open Postman, to call API's (  localhost:8080 )
+src/main/java/hello
+├── Application.java          # entry point + CommandLineRunner (H2 seeding, quote fetch)
+├── config/                   # RestTemplate bean
+├── controller/               # GreetingController, TopicController, HelloController
+├── declaration/              # CustomPredicate, TimeClient (default/static interface methods)
+├── model/                    # Topic, Greeting, Customer, Quote, Value, SimpleTimeClient
+└── service/                  # TopicService — where most of the Java 8 examples live
 ```
 
+## Helpful links
 
-## Helpful Links
 Spring:
 
 https://spring.io/guides
 
-Java 8: 
+Java 8:
 
 http://www.baeldung.com/java-8-functional-interfaces
-
-http://winterbe.com/posts/2015/05/22/java8-concurrency-tutorial-atomic-concurrent-map-examples/
 
 https://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html
 
 http://winterbe.com/posts/2014/07/31/java8-stream-tutorial-examples/
 
-http://www.oracle.com/technetwork/articles/java/ma14-java-se-8-streams-2177646.html
-
 https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html
 
-https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html
+Java 21:
 
-http://www.baeldung.com/foreach-java
+https://docs.oracle.com/en/java/javase/21/text-blocks/index.html
 
-http://winterbe.com/posts/2015/03/25/java8-examples-string-number-math-files/
+https://docs.spring.io/spring-boot/docs/current/reference/html/
 
-http://www.baeldung.com/java-8-comparator-comparing
+## Built with
 
-http://www.baeldung.com/java-8-sort-lambda
-
-https://dzone.com/articles/java-8-friday-goodies-new-new
-
-
-## Built With
-
-* [Maven](https://maven.apache.org/) - Dependency Management
+* [Maven](https://maven.apache.org/) — build and dependency management
+* [Spring Boot](https://spring.io/projects/spring-boot) 3.5.16
 
 ## Authors
 
-* **Rehman Murad Ali** 
-
-
+* **Rehman Murad Ali** — original author
