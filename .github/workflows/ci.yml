@@ -5,17 +5,24 @@ on:
     branches: [master]
   pull_request:
 
+# No marketplace actions are used here on purpose: runners for this repository cannot
+# resolve them ("Failed to resolve action download info. Error: Service Unavailable"),
+# so actions/checkout and actions/setup-java fail before the job body ever runs.
+# Checkout is done with git directly, and the runner image already ships JDK 21.
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        run: |
+          git init -q .
+          git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          git fetch -q --depth 1 origin "$GITHUB_SHA"
+          git checkout -q FETCH_HEAD
 
-      - uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: temurin
-          cache: maven
-
-      - name: Build and test
-        run: ./mvnw -B clean verify
+      - name: Build and test on JDK 21
+        run: |
+          export JAVA_HOME="$JAVA_HOME_21_X64"
+          export PATH="$JAVA_HOME/bin:$PATH"
+          java -version
+          ./mvnw -B clean verify
