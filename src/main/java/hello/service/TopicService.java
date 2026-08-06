@@ -35,8 +35,8 @@ public class TopicService {
      * @param id
      * @return
      */
-    public Topic getTopicWithId(String id) {
-        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst().get();
+    public Optional<Topic> getTopicWithId(String id) {
+        return topics.stream().filter(topic -> topic.id().equals(id)).findFirst();
     }
 
     public void addTopic(Topic topic) {
@@ -50,7 +50,7 @@ public class TopicService {
      * @param topic
      */
     public void updateTopic(String id, Topic topic) {
-        OptionalInt indexOfElement = IntStream.range(0, topics.size()).filter(index -> id.equals(topics.get(index).getId())).findFirst();
+        OptionalInt indexOfElement = IntStream.range(0, topics.size()).filter(index -> id.equals(topics.get(index).id())).findFirst();
         if (indexOfElement.isPresent()) topics.set(indexOfElement.getAsInt(), topic);
     }
 
@@ -60,7 +60,7 @@ public class TopicService {
      * @param id
      */
     public void deleteTopic(String id) {
-        topics.removeIf(topic -> topic.getId().equals(id));
+        topics.removeIf(topic -> topic.id().equals(id));
     }
 
     /**
@@ -70,7 +70,7 @@ public class TopicService {
      * @return
      */
     public List<Topic> filterMinimumLengthForId(Integer minLength) {
-        return printTopicsWithPredicate(topics, topic -> topic.getId().length() > minLength);
+        return printTopicsWithPredicate(topics, topic -> topic.id().length() > minLength);
     }
 
 
@@ -96,7 +96,7 @@ public class TopicService {
      * @return
      */
     public List<Topic> sortTopicsWithID() {
-        topics.sort(Comparator.comparing(Topic::getId));
+        topics.sort(Comparator.comparing(Topic::id));
         return topics;
     }
 
@@ -107,7 +107,7 @@ public class TopicService {
      * @return
      */
     public String returnAllTopicIDWithStringSlicing() {
-        List<String> topicIds = topics.stream().map(topic -> topic.getId()).collect(Collectors.toList());
+        List<String> topicIds = topics.stream().map(Topic::id).toList();
         return String.join(":", topicIds);
     }
 
@@ -147,13 +147,11 @@ public class TopicService {
      */
     public String findIdHavingCharacter() {
         Pattern pattern = Pattern.compile(".*g.*");
-        Object[] topicIdObjectList = topics.stream().map(topic -> topic.getId()).collect(Collectors.toList()).toArray();
-
-        String[] topicIdList = Arrays.stream(topicIdObjectList).toArray(String[]::new);
+        String[] topicIdList = topics.stream().map(Topic::id).toArray(String[]::new);
 
         return Stream.of(topicIdList)
                 .filter(pattern.asPredicate())
-                .collect(Collectors.toList())
+                .toList()
                 .toString();
     }
 
