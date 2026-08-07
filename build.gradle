@@ -16,7 +16,7 @@ apply plugin: 'io.spring.dependency-management'
 
 bootJar {
     archiveBaseName = 'gs-spring-boot'
-    version = '0.1.0'
+    archiveVersion = '0.1.0'
 }
 
 repositories {

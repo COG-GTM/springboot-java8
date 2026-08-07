@@ -57,7 +57,11 @@ public class Application implements CommandLineRunner {
     private static void logRandomQuote(RestTemplate restTemplate) {
         try {
             Quote quote = restTemplate.getForObject(QUOTERS_URL, Quote.class);
-            log.info(quote.toString());
+            if (quote == null) {
+                log.warn("Unable to retrieve random quote from {}", QUOTERS_URL);
+            } else {
+                log.info(quote.toString());
+            }
         } catch (RestClientException ex) {
             log.warn("Unable to retrieve random quote from {}", QUOTERS_URL, ex);
         }
