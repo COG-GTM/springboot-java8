@@ -17,11 +17,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClientException;
 
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
+    private static final String QUOTERS_URL = "http://gturnquist-quoters.cfapps.io/api/random";
 
     public static void main(String[] args) {
 
@@ -36,8 +38,7 @@ public class Application implements CommandLineRunner {
         }
 
         RestTemplate restTemplate =  new RestTemplate();
-        Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-        log.info(quote.toString());
+        logRandomQuote(restTemplate);
     }
 
 
@@ -49,10 +50,17 @@ public class Application implements CommandLineRunner {
     @Bean
     public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
         return args -> {
-            Quote quote = restTemplate.getForObject(
-                    "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-            log.info(quote.toString());
+            logRandomQuote(restTemplate);
         };
+    }
+
+    private static void logRandomQuote(RestTemplate restTemplate) {
+        try {
+            Quote quote = restTemplate.getForObject(QUOTERS_URL, Quote.class);
+            log.info(quote.toString());
+        } catch (RestClientException ex) {
+            log.warn("Unable to retrieve random quote from {}", QUOTERS_URL, ex);
+        }
     }
 
 
