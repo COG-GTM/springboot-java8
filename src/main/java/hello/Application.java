@@ -35,9 +35,6 @@ public class Application implements CommandLineRunner {
             System.out.println(beanName);
         }
 
-        RestTemplate restTemplate =  new RestTemplate();
-        Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-        log.info(quote.toString());
     }
 
 
@@ -47,11 +44,15 @@ public class Application implements CommandLineRunner {
     }
 
     @Bean
-    public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
+    public CommandLineRunner quoteRunner(RestTemplate restTemplate) {
         return args -> {
-            Quote quote = restTemplate.getForObject(
-                    "http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-            log.info(quote.toString());
+            try {
+                Quote quote = restTemplate.getForObject(
+                        "https://quoters.apps.pcfone.io/api/random", Quote.class);
+                log.info(String.valueOf(quote));
+            } catch (Exception e) {
+                log.warn("Quote service unavailable: {}", e.getMessage());
+            }
         };
     }
 
@@ -80,8 +81,9 @@ public class Application implements CommandLineRunner {
 
         log.info("Querying for customer records where first_name = 'Josh':");
         jdbcTemplate.query(
-                "SELECT id, first_name, last_name FROM customers WHERE first_name = ?", new Object[]{"Josh"},
-                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
+                "SELECT id, first_name, last_name FROM customers WHERE first_name = ?",
+                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name")),
+                "Josh"
         ).forEach(customer -> log.info(customer.toString()));
 
     }
