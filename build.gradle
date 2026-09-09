@@ -25,11 +25,15 @@ repositories {
 sourceCompatibility = 11
 targetCompatibility = 11
 
+tasks.withType(JavaCompile) {
+    options.release = 11
+}
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
-    runtimeOnly("com.h2database:h2")
+    implementation("com.h2database:h2")
     testImplementation("junit:junit")
 }
 
