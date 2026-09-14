@@ -1,12 +1,10 @@
 package hello.controller;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -17,16 +15,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class TopicControllerTest {
+class TopicControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    public void getAllTopicsReturnsSeededTopics() throws Exception {
+    void getAllTopicsReturnsSeededTopics() throws Exception {
         mockMvc.perform(get("/topic"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
@@ -34,14 +31,14 @@ public class TopicControllerTest {
     }
 
     @Test
-    public void getTopicById() throws Exception {
+    void getTopicById() throws Exception {
         mockMvc.perform(get("/topic/java"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subjectName").value("Core Java"));
     }
 
     @Test
-    public void addUpdateAndDeleteTopic() throws Exception {
+    void addUpdateAndDeleteTopic() throws Exception {
         mockMvc.perform(post("/topic")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\":\"kotlin\",\"subjectName\":\"Kotlin\",\"subjectDescription\":\"Kotlin Desc\"}"))
@@ -67,14 +64,14 @@ public class TopicControllerTest {
     }
 
     @Test
-    public void filterByMinimumIdLength() throws Exception {
+    void filterByMinimumIdLength() throws Exception {
         mockMvc.perform(get("/topic/minimum/length/5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)));
     }
 
     @Test
-    public void sortTopicsById() throws Exception {
+    void sortTopicsById() throws Exception {
         mockMvc.perform(get("/topic/sort"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value("java"))

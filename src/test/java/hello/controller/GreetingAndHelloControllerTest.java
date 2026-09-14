@@ -1,11 +1,9 @@
 package hello.controller;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsString;
@@ -14,30 +12,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class GreetingAndHelloControllerTest {
+class GreetingAndHelloControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    public void greetingDefaultsToWorld() throws Exception {
+    void greetingDefaultsToWorld() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value("Hello, World!"));
     }
 
     @Test
-    public void greetingUsesNameParam() throws Exception {
+    void greetingUsesNameParam() throws Exception {
         mockMvc.perform(get("/").param("name", "Devin"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value("Hello, Devin!"));
     }
 
     @Test
-    public void datetimeEndpoint() throws Exception {
+    void datetimeEndpoint() throws Exception {
         mockMvc.perform(get("/datetime"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Greetings from Spring Boot!")))
@@ -45,7 +42,7 @@ public class GreetingAndHelloControllerTest {
     }
 
     @Test
-    public void stringOperationEndpoint() throws Exception {
+    void stringOperationEndpoint() throws Exception {
         mockMvc.perform(get("/topic/string/operation"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("spring:java:javascript")))
@@ -54,7 +51,7 @@ public class GreetingAndHelloControllerTest {
     }
 
     @Test
-    public void fileOperationEndpoint() throws Exception {
+    void fileOperationEndpoint() throws Exception {
         mockMvc.perform(get("/topic/file/operation"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Read \"temp.txt\"")))
