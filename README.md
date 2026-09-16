@@ -76,7 +76,7 @@ GET /datetime
 
 ### Prerequisites
 
-1) Java sdk
+1) JDK 17
 2) POSTMAN
 
 ### Installing
@@ -89,6 +89,26 @@ GET /datetime
 3) Run on location machine
 4) Open Postman, to call API's (  localhost:8080 )
 ```
+
+### Build and run
+
+Maven:
+```
+mvn clean verify
+java -jar target/gs-spring-boot-0.1.0.jar
+```
+
+Gradle:
+```
+./gradlew clean build
+java -jar build/libs/gs-spring-boot-0.1.0.jar
+```
+
+### Configuration
+
+`quotes.api.url` (empty by default) points at the external random quote service
+used by the startup runner. When it is empty, or the service is unreachable, the
+application logs `No quote available` and continues to start.
 
 
 ## Helpful Links
@@ -125,7 +145,10 @@ https://dzone.com/articles/java-8-friday-goodies-new-new
 
 ## Built With
 
+* Java 17
+* Spring Boot 3.5.x
 * [Maven](https://maven.apache.org/) - Dependency Management
+* [Gradle](https://gradle.org/) - Alternative build
 
 ## Authors
 
