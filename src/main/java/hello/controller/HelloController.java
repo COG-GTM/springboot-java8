@@ -10,14 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.chrono.ChronoPeriod;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 @RestController
 public class HelloController {
@@ -53,7 +48,7 @@ public class HelloController {
                 "Datetime of previous month was " + String.valueOf(myTimeClient.getLocalDateTime().minus(1, ChronoUnit.MONTHS)) + "----------------------" +
                 "Is this a leap year ?  " + String.valueOf(LocalDate.now().isLeapYear()) + "----------------------" +
                 "Default system zone id   " + String.valueOf(ZoneId.systemDefault()) + "-------------------" +
-                "Time in California: " + myTimeClient.getZonedDateTime("Canada/Central").toString();
+                "Time in California: " + ZonedDateTime.now(TimeClient.getZoneId("America/Los_Angeles")).toString();
 
     }
 

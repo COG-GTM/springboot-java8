@@ -1,6 +1,7 @@
 package hello.service;
 
 import hello.declaration.CustomPredicate;
+import hello.exception.TopicNotFoundException;
 import hello.model.Topic;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +37,10 @@ public class TopicService {
      * @return
      */
     public Topic getTopicWithId(String id) {
-        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst().get();
+        return topics.stream()
+                .filter(topic -> topic.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new TopicNotFoundException(id));
     }
 
     public void addTopic(Topic topic) {
@@ -186,7 +190,7 @@ public class TopicService {
         Path start = Paths.get("");
         int maxDepth = 25;
         try (Stream<Path> stream = Files.find(start, maxDepth, (path, attr) ->
-                String.valueOf(path).startsWith("grad"))) {
+                attr.isRegularFile() && path.getFileName() != null && path.getFileName().toString().startsWith("grad"))) {
             String joined = stream
                     .sorted()
                     .map(String::valueOf)
@@ -207,8 +211,8 @@ public class TopicService {
         int maxDepth = 5;
         try (Stream<Path> stream = Files.walk(start, maxDepth)) {
             String joined = stream
+                    .filter(path -> Files.isRegularFile(path) && path.getFileName() != null && path.getFileName().toString().startsWith("grad"))
                     .map(String::valueOf)
-                    .filter(path -> path.startsWith("grad"))
                     .sorted()
                     .collect(Collectors.joining("; "));
             return joined;
@@ -224,7 +228,9 @@ public class TopicService {
      */
     public String readFileWithStreamFunction() {
         Path path = Paths.get("temp.txt");
-        System.out.println();
+        if (!Files.exists(path)) {
+            return " temp.txt not found ";
+        }
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String lines = reader
                     .lines()
