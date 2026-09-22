@@ -190,7 +190,7 @@ public class TopicService {
         Path start = Paths.get("");
         int maxDepth = 25;
         try (Stream<Path> stream = Files.find(start, maxDepth, (path, attr) ->
-                path.getFileName() != null && path.getFileName().toString().startsWith("grad"))) {
+                attr.isRegularFile() && path.getFileName() != null && path.getFileName().toString().startsWith("grad"))) {
             String joined = stream
                     .sorted()
                     .map(String::valueOf)
@@ -211,7 +211,7 @@ public class TopicService {
         int maxDepth = 5;
         try (Stream<Path> stream = Files.walk(start, maxDepth)) {
             String joined = stream
-                    .filter(path -> path.getFileName() != null && path.getFileName().toString().startsWith("grad"))
+                    .filter(path -> Files.isRegularFile(path) && path.getFileName() != null && path.getFileName().toString().startsWith("grad"))
                     .map(String::valueOf)
                     .sorted()
                     .collect(Collectors.joining("; "));
