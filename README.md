@@ -1,5 +1,5 @@
 # springboot-java8
-The project is made on spring boot. The project summarize the new features present in Java 8.
+Spring Boot 3.3.13 application running on Java 21. The project summarizes the modern Java feature set that started with Java 8.
 It contain list of harcoded topics list. You can call the apis's with POSTMAN to add,delete,update Topic list
 In addition, it uses 
 1) Java 8 NIO methods 
@@ -17,8 +17,24 @@ In addition, it uses
 
 
 ## Getting Started
-1) Download or clone the project with link 
+1) Download or clone the project with link
 (https://github.com/RehmanMuradAli/springboot-java8/)
+
+## Build and Run
+
+Requires JDK 21 (`JAVA_HOME` must point at a Java 21 installation).
+
+Maven:
+```
+./mvnw clean verify      # compile + run the test suite
+./mvnw spring-boot:run   # run the app on http://localhost:8080
+```
+
+Gradle:
+```
+./gradlew test           # run the test suite
+./gradlew bootRun        # run the app on http://localhost:8080
+```
 
 ## Available API's
 
@@ -76,8 +92,19 @@ GET /datetime
 
 ### Prerequisites
 
-1) Java sdk
-2) POSTMAN
+1) JDK 21
+2) POSTMAN (optional, for calling the API's)
+
+## Upgrade notes (Spring Boot 2.0.2 / Java 8 -> Spring Boot 3.3.13 / Java 21)
+
+Endpoint paths and responses are unchanged. Behavioral deltas introduced by the upgrade:
+
+* The startup quote fetch is now opt-in. It only runs when `app.quote.enabled=true`
+  (default `false`), is configurable via `app.quote.url` plus connect/read timeouts, and
+  logs a warning instead of failing startup when the remote host is unreachable.
+* `application.properties` moved onto the classpath at `src/main/resources`, so the H2
+  datasource settings are picked up by both the Maven and Gradle builds.
+* `spring-boot-properties-migrator` was removed; it is a Spring Boot 2.x-only helper.
 
 ### Installing
 
