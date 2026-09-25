@@ -1,0 +1,7 @@
+# Service names the app and its neighbours depend on (stand-in for Route53 / corporate DNS).
+172.28.0.10  db.topics.internal
+172.28.0.11  reporting.topics.internal
+172.28.0.20  app.topics.internal
+172.28.0.30  lb.topics.internal
+172.28.0.40  metrics.topics.internal
+172.28.0.41  grafana.topics.internal

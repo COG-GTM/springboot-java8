@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 5s
+  external_labels:
+    env: legacy
+
+scrape_configs:
+  - job_name: topics-api
+    metrics_path: /manage/prometheus
+    static_configs:
+      - targets: ["app.topics.internal:8080"]
+        labels:
+          service: topics-api
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
