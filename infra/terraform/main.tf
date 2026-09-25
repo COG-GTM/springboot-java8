@@ -21,7 +21,7 @@ resource "docker_image" "app" {
     }
   }
   triggers = {
-    jar = filesha256("${path.module}/../../target/app.jar")
+    jar = fileexists("${path.module}/../../target/app.jar") ? filesha256("${path.module}/../../target/app.jar") : "missing"
   }
 }
 
