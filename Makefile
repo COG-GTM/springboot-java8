@@ -161,6 +161,4 @@ aws-down: aws-init
 	$(MAKE) --no-print-directory aws-check-clean
 
 aws-check-clean:
-	@echo "== tagged resources remaining (Project=modernization-demo, Track=$(TRACK)) =="
-	@aws resourcegroupstaggingapi get-resources --region $(AWS_REGION) \
-	  --tag-filters Key=Project,Values=modernization-demo Key=Track,Values=$(TRACK) --query 'ResourceTagMappingList[].ResourceARN' --output json | tee /dev/stderr | grep -q '^\[\]$$' && echo "clean: 0 tagged resources remain"
+	infra/scripts/aws_check_clean.sh $(AWS_REGION) modernization-demo $(TRACK)
