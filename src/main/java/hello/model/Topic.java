@@ -1,9 +1,9 @@
 package hello.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "topics")
@@ -14,7 +14,7 @@ public class Topic {
     @Column(nullable = false)
     private String subjectName;
 
-    @Column(nullable = false)
+    @Column(name = "description", nullable = false)
     private String subjectDescription;
 
     public Topic() {
