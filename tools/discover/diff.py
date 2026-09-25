@@ -72,6 +72,8 @@ def declared(repo):
         "db_url_key": placeholder_key(db_url),
         "db_host_default": db_host.group(1) if db_host else None,
         "ddl_auto": p.get("spring.jpa.hibernate.ddl-auto"),
+        "column_overrides": re.findall(r'@Column\(\s*name\s*=\s*"([^"]+)"', entity_src),
+        "datasource_type": p.get("spring.datasource.type", "HikariDataSource (framework default)"),
         "hikari_max_pool": p.get("spring.datasource.hikari.maximum-pool-size", "10 (framework default)"),
         "open_in_view": p.get("spring.jpa.open-in-view", "true (framework default)"),
         "sql_logging": p.get("spring.jpa.show-sql", "false"),
@@ -149,9 +151,10 @@ def matrix(dec, obs):
 
     # 4. DB dependency
     for db in obs["rds"]:
-        legacy_contract = dec["ddl_auto"] == "validate"
+        legacy_contract = dec["ddl_auto"] == "validate" and not dec["column_overrides"]
+        cols = f", @Column(name=) overrides={dec['column_overrides']}" if dec["column_overrides"] else ""
         row(f"{db['id']} schema contract", f"{db['engine']} {db['engine_version']} owned by infra/db/init (ddl-auto=validate expected)",
-            f"ddl-auto={dec['ddl_auto']}, {dec['persistence_api']}, driver={dec['postgres_driver']}", legacy_contract,
+            f"ddl-auto={dec['ddl_auto']}, {dec['persistence_api']}, driver={dec['postgres_driver']}{cols}", legacy_contract,
             "app mutates a schema shared with the reporting consumer (view/function break or NOT NULL violations)", gap=4)
 
     # 5. firewall / DNS
@@ -166,9 +169,11 @@ def matrix(dec, obs):
             "name does not resolve inside the VPC", gap=5)
 
     # 6. NFR-relevant defaults (not observable statically on infra; flagged for the load test)
-    nfr_ok = str(dec["hikari_max_pool"]).startswith("20") and str(dec["open_in_view"]).startswith("false") and dec["sql_logging"] == "false"
-    row("connection pool / logging", "baseline: pool=20, open-in-view=false, no SQL logging",
-        f"pool={dec['hikari_max_pool']}, open-in-view={dec['open_in_view']}, show-sql={dec['sql_logging']}", nfr_ok,
+    pooled = "Hikari" in dec["datasource_type"]
+    nfr_ok = pooled and str(dec["hikari_max_pool"]).startswith("20") and str(dec["open_in_view"]).startswith("false") and dec["sql_logging"] == "false"
+    row("connection pool / logging", "baseline: Hikari pool=20, open-in-view=false, no SQL logging",
+        f"datasource={dec['datasource_type'].rsplit('.', 1)[-1]}, pool={dec['hikari_max_pool'] if pooled else 'none (connection per request)'}, "
+        f"open-in-view={dec['open_in_view']}, show-sql={dec['sql_logging']}", nfr_ok,
         "latency/throughput regression under load only -> compare k6 vs demo/BASELINE.json", gap=6)
     return rows
 
