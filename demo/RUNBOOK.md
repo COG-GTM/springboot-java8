@@ -86,13 +86,16 @@ on a schema shared with the reporting cron, SG missing 8081, pool/logging defaul
 2. `make reset && make up` on the migrated image → each planted layer surfaces in order and is fixed:
    `UnsupportedClassVersionError` (gap 1) → password missing (gap 3) → nginx `/health` 404 (gap 2) → 502 from firewall on 8081 +
    Prometheus target down (gap 5).
-3. `make loadtest` + `make compare` against the legacy baseline: **POST /topic returns 500 — `null value in column "subject_description"`** (gap 4)
-   and **p95 regression** with throughput collapse (gap 6). Devin opens Grafana: Hikari pending connections and log events/s spike, pool is 10 not 20.
-4. Fixes: revert schema mutation / restore column mapping; restore pool=20, `open-in-view=false`, SQL logging off. Re-run → `verify OK`, `compare` within tolerance.
+3. Smoke: **GET /topic returns 500 — `column t1_0.description does not exist`** and Hibernate's `ddl-auto=update` is refused by Postgres
+   (`cannot alter type of a column used by a view or rule … topic_summary_v`) — the second DB consumer is what blocked the mutation (gap 4).
+4. `make loadtest` + `make compare` against the legacy baseline: **p95 ≈ 20× and throughput ≈ ⅓** (gap 6). Devin opens Grafana: the
+   *Hikari active/pending* panel is empty — the plugin swapped Hikari for `DriverManagerDataSource` (a new TCP+SCRAM connection per request) and
+   turned SQL logging on. Fixes: restore column mapping + `ddl-auto=validate`; restore Hikari (pool=20, `open-in-view=false`, SQL logging off).
+   Re-run → `verify OK`, `compare` within tolerance.
 5. Browser walkthrough of the LB endpoints and the Grafana dashboard, screen-recorded.
 
-**Money moments:** (a) the `compare_nfr.py` FAIL block — legacy p95 vs migrated p95 side by side; (b) the Grafana panel pair
-*Hikari active/pending* and *log events/s* jumping at the load-test start; (c) CI going red → green without a human touching it.
+**Money moments:** (a) the `compare_nfr.py` FAIL block — legacy p95 vs migrated p95 side by side; (b) the Grafana *Hikari active/pending* panel
+going blank while *log events/s* spikes at the load-test start; (c) CI going red → green without a human touching it.
 
 **Takeaway:** *A migration that passes unit tests can still fail its baseline — you only find out by deploying, loading, and reading the dashboards.* (gaps 4, 5, 6)
 
