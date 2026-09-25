@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-09-25T07:56:35.046Z",
+  "target": "http://lb.topics.internal",
+  "profile": {
+    "vus": 20,
+    "duration": "30s"
+  },
+  "requests": 64242,
+  "rps": 2138.88,
+  "latency_ms": {
+    "p50": 0.82,
+    "p90": 1.44,
+    "p95": 1.7,
+    "p99": 2.45,
+    "avg": 0.91,
+    "max": 20.29
+  },
+  "endpoint_p95_ms": {
+    "list": 1.26,
+    "report": 1.5
+  },
+  "error_rate": 0,
+  "checks_failed": 0,
+  "thresholds": {
+    "http_req_failed: rate<0.01": "pass",
+    "http_req_duration: p(95)<250": "pass"
+  }
+}

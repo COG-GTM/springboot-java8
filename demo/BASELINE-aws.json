@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-09-25T08:18:48.620Z",
+  "target": "http://moddemo-topics-alb-1184534545.us-east-1.elb.amazonaws.com",
+  "profile": {
+    "vus": 20,
+    "duration": "30s"
+  },
+  "requests": 7974,
+  "rps": 262.11,
+  "latency_ms": {
+    "p50": 64.82,
+    "p90": 73.16,
+    "p95": 78.37,
+    "p99": 115.75,
+    "avg": 67.09,
+    "max": 468.58
+  },
+  "endpoint_p95_ms": {
+    "list": 77.31,
+    "report": 72.21
+  },
+  "error_rate": 0,
+  "checks_failed": 0,
+  "thresholds": {
+    "http_req_duration: p(95)<250": "pass",
+    "http_req_failed: rate<0.01": "pass"
+  }
+}

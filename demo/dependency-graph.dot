@@ -1,0 +1,45 @@
+digraph deps {
+  rankdir=LR; node [shape=box, style="rounded,filled", fontname=Helvetica, fontsize=10]; edge [fontname=Helvetica, fontsize=9];
+  "sg:moddemo-topics-app" [label="SG: moddemo-topics-app\n8080 from sg-0c3cde3ce9ac15173", fillcolor="#f4a6a6"];
+  "sg:moddemo-topics-alb" [label="SG: moddemo-topics-alb\n80 from 0.0.0.0/0", fillcolor="#f4a6a6"];
+  "sg:moddemo-topics-db" [label="SG: moddemo-topics-db\n5432 from sg-090e9d7aacd2257a7", fillcolor="#f4a6a6"];
+  "cidr:0.0.0.0/0" [label="CIDR: 0.0.0.0/0", fillcolor="#eeeeee"];
+  "ec2:moddemo-topics-app" [label="EC2: moddemo-topics-app\nt3.small :8080 base=eclipse-temurin:11-jre", fillcolor="#a8d5ba"];
+  "image:topics-api:legacy" [label="Image: topics-api:legacy", fillcolor="#c8e6c9"];
+  "alb:moddemo-topics-alb" [label="ALB: moddemo-topics-alb", fillcolor="#f9d67a"];
+  "tg:moddemo-topics-tg" [label="TG: moddemo-topics-tg\n:8080 hc=/manage/health/readiness", fillcolor="#fbe7b3"];
+  "rds:moddemo-topics-db" [label="RDS: moddemo-topics-db\npostgres 16.13 :5432", fillcolor="#9ec5fe"];
+  "secret:moddemo-topics/db" [label="Secret: moddemo-topics/db\nkeys=['DB_PASSWORD', 'DB_USER']", fillcolor="#d3b7f7"];
+  "zone:demo.internal" [label="Zone: demo.internal", fillcolor="#cfd8dc"];
+  "dns:app.topics.demo.internal" [label="DNS: app.topics.demo.internal\nA", fillcolor="#e0e7ea"];
+  "dns:db.topics.demo.internal" [label="DNS: db.topics.demo.internal\nCNAME", fillcolor="#e0e7ea"];
+  "dns:lb.topics.demo.internal" [label="DNS: lb.topics.demo.internal\nA", fillcolor="#e0e7ea"];
+  "sg:moddemo-topics-alb" -> "sg:moddemo-topics-app" [label="allows_ingress
+port=8080"];
+  "cidr:0.0.0.0/0" -> "sg:moddemo-topics-alb" [label="allows_ingress
+port=80"];
+  "sg:moddemo-topics-app" -> "sg:moddemo-topics-db" [label="allows_ingress
+port=5432"];
+  "sg:moddemo-topics-app" -> "ec2:moddemo-topics-app" [style=dashed, color=gray, arrowhead=none];
+  "ec2:moddemo-topics-app" -> "image:topics-api:legacy" [label="runs_image"];
+  "sg:moddemo-topics-alb" -> "alb:moddemo-topics-alb" [style=dashed, color=gray, arrowhead=none];
+  "alb:moddemo-topics-alb" -> "tg:moddemo-topics-tg" [label="routes_to
+listener_port=80"];
+  "tg:moddemo-topics-tg" -> "ec2:moddemo-topics-app" [label="routes_to
+port=8080"];
+  "tg:moddemo-topics-tg" -> "ec2:moddemo-topics-app" [label="health_checks
+path=/manage/health/readiness port=8080 state=healthy"];
+  "sg:moddemo-topics-db" -> "rds:moddemo-topics-db" [style=dashed, color=gray, arrowhead=none];
+  "ec2:moddemo-topics-app" -> "secret:moddemo-topics/db" [label="reads_secret
+key=DB_PASSWORD"];
+  "zone:demo.internal" -> "dns:app.topics.demo.internal" [style=dashed, color=gray, arrowhead=none];
+  "dns:app.topics.demo.internal" -> "ec2:moddemo-topics-app" [label="resolves_to"];
+  "zone:demo.internal" -> "dns:db.topics.demo.internal" [style=dashed, color=gray, arrowhead=none];
+  "dns:db.topics.demo.internal" -> "rds:moddemo-topics-db" [label="resolves_to"];
+  "zone:demo.internal" -> "dns:lb.topics.demo.internal" [style=dashed, color=gray, arrowhead=none];
+  "dns:lb.topics.demo.internal" -> "alb:moddemo-topics-alb" [label="resolves_to"];
+  "ec2:moddemo-topics-app" -> "dns:db.topics.demo.internal" [label="connects_to_db
+port=5432"];
+  "ec2:moddemo-topics-app" -> "rds:moddemo-topics-db" [label="connects_to_db
+port=5432"];
+}

@@ -1,0 +1,327 @@
+{
+  "region": "us-east-1",
+  "project": "modernization-demo",
+  "track": "java",
+  "nodes": [
+    {
+      "id": "sg:moddemo-topics-app",
+      "type": "security_group",
+      "arn": "arn:aws:ec2:us-east-1::security-group/sg-090e9d7aacd2257a7",
+      "attrs": {
+        "group_id": "sg-090e9d7aacd2257a7",
+        "ingress": [
+          {
+            "port": "8080",
+            "from": "sg-0c3cde3ce9ac15173"
+          }
+        ],
+        "description": "topics-api host: only the ALB, only the legacy app port"
+      }
+    },
+    {
+      "id": "sg:moddemo-topics-alb",
+      "type": "security_group",
+      "arn": "arn:aws:ec2:us-east-1::security-group/sg-0c3cde3ce9ac15173",
+      "attrs": {
+        "group_id": "sg-0c3cde3ce9ac15173",
+        "ingress": [
+          {
+            "port": "80",
+            "from": "0.0.0.0/0"
+          }
+        ],
+        "description": "ALB: HTTP from anywhere"
+      }
+    },
+    {
+      "id": "sg:moddemo-topics-db",
+      "type": "security_group",
+      "arn": "arn:aws:ec2:us-east-1::security-group/sg-025f56542bd00152e",
+      "attrs": {
+        "group_id": "sg-025f56542bd00152e",
+        "ingress": [
+          {
+            "port": "5432",
+            "from": "sg-090e9d7aacd2257a7"
+          }
+        ],
+        "description": "RDS: postgres from the app SG only"
+      }
+    },
+    {
+      "id": "cidr:0.0.0.0/0",
+      "type": "cidr",
+      "arn": null,
+      "attrs": {}
+    },
+    {
+      "id": "ec2:moddemo-topics-app",
+      "type": "ec2_instance",
+      "arn": "arn:aws:ec2:us-east-1::instance/i-054e1366126f767af",
+      "attrs": {
+        "instance_id": "i-054e1366126f767af",
+        "instance_type": "t3.small",
+        "private_ip": "10.42.0.27",
+        "state": "running",
+        "runtime_image": "eclipse-temurin:11-jre",
+        "app_image": "374199896615.dkr.ecr.us-east-1.amazonaws.com/moddemo-topics/topics-api:legacy",
+        "secret_key_read": "DB_PASSWORD",
+        "db_host": "db.topics.demo.internal",
+        "host_port": 8080,
+        "container_port": 8080
+      }
+    },
+    {
+      "id": "image:topics-api:legacy",
+      "type": "container_image",
+      "arn": "arn:aws:ecr:us-east-1:374199896615:repository/moddemo-topics/topics-api",
+      "attrs": {
+        "uri": "374199896615.dkr.ecr.us-east-1.amazonaws.com/moddemo-topics/topics-api:legacy",
+        "base_image": "eclipse-temurin:11-jre",
+        "pushed_at": "2026-09-25T08:16:20.126000+00:00",
+        "digest": "sha256:5fc39f9c2ba2eca9081a93e39d22282cad3a31954b5ab9220f532040af723155"
+      }
+    },
+    {
+      "id": "alb:moddemo-topics-alb",
+      "type": "load_balancer",
+      "arn": "arn:aws:elasticloadbalancing:us-east-1:374199896615:loadbalancer/app/moddemo-topics-alb/39ecc5d8380ae56d",
+      "attrs": {
+        "dns_name": "moddemo-topics-alb-1184534545.us-east-1.elb.amazonaws.com",
+        "scheme": "internet-facing",
+        "state": "active"
+      }
+    },
+    {
+      "id": "tg:moddemo-topics-tg",
+      "type": "target_group",
+      "arn": "arn:aws:elasticloadbalancing:us-east-1:374199896615:targetgroup/moddemo-topics-tg/f850f2bc057bd096",
+      "attrs": {
+        "port": 8080,
+        "protocol": "HTTP",
+        "health_check_path": "/manage/health/readiness",
+        "health_check_port": "traffic-port",
+        "matcher": "200"
+      }
+    },
+    {
+      "id": "rds:moddemo-topics-db",
+      "type": "rds_instance",
+      "arn": "arn:aws:rds:us-east-1:374199896615:db:moddemo-topics-db",
+      "attrs": {
+        "engine": "postgres",
+        "engine_version": "16.13",
+        "endpoint": "moddemo-topics-db.c0pwcucu2ddp.us-east-1.rds.amazonaws.com",
+        "port": 5432,
+        "db_name": "topics",
+        "status": "available",
+        "instance_class": "db.t4g.micro"
+      }
+    },
+    {
+      "id": "secret:moddemo-topics/db",
+      "type": "secret",
+      "arn": "arn:aws:secretsmanager:us-east-1:374199896615:secret:moddemo-topics/db-M0tkz2",
+      "attrs": {
+        "keys": [
+          "DB_PASSWORD",
+          "DB_USER"
+        ]
+      }
+    },
+    {
+      "id": "zone:demo.internal",
+      "type": "hosted_zone",
+      "arn": "arn:aws:route53:::hostedzone/Z0683628AED5PYN8CQSZ",
+      "attrs": {
+        "private": true
+      }
+    },
+    {
+      "id": "dns:app.topics.demo.internal",
+      "type": "dns_record",
+      "arn": null,
+      "attrs": {
+        "zone": "zone:demo.internal",
+        "record_type": "A",
+        "target": "10.42.0.27"
+      }
+    },
+    {
+      "id": "dns:db.topics.demo.internal",
+      "type": "dns_record",
+      "arn": null,
+      "attrs": {
+        "zone": "zone:demo.internal",
+        "record_type": "CNAME",
+        "target": "moddemo-topics-db.c0pwcucu2ddp.us-east-1.rds.amazonaws.com"
+      }
+    },
+    {
+      "id": "dns:lb.topics.demo.internal",
+      "type": "dns_record",
+      "arn": null,
+      "attrs": {
+        "zone": "zone:demo.internal",
+        "record_type": "A",
+        "target": "moddemo-topics-alb-1184534545.us-east-1.elb.amazonaws.com"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "sg:moddemo-topics-alb",
+      "to": "sg:moddemo-topics-app",
+      "type": "allows_ingress",
+      "attrs": {
+        "port": 8080,
+        "protocol": "tcp"
+      }
+    },
+    {
+      "from": "cidr:0.0.0.0/0",
+      "to": "sg:moddemo-topics-alb",
+      "type": "allows_ingress",
+      "attrs": {
+        "port": 80,
+        "protocol": "tcp"
+      }
+    },
+    {
+      "from": "sg:moddemo-topics-app",
+      "to": "sg:moddemo-topics-db",
+      "type": "allows_ingress",
+      "attrs": {
+        "port": 5432,
+        "protocol": "tcp"
+      }
+    },
+    {
+      "from": "sg:moddemo-topics-app",
+      "to": "ec2:moddemo-topics-app",
+      "type": "allows_ingress",
+      "attrs": {
+        "scope": "attached"
+      }
+    },
+    {
+      "from": "ec2:moddemo-topics-app",
+      "to": "image:topics-api:legacy",
+      "type": "runs_image",
+      "attrs": {
+        "base_image": "eclipse-temurin:11-jre"
+      }
+    },
+    {
+      "from": "sg:moddemo-topics-alb",
+      "to": "alb:moddemo-topics-alb",
+      "type": "allows_ingress",
+      "attrs": {
+        "scope": "attached"
+      }
+    },
+    {
+      "from": "alb:moddemo-topics-alb",
+      "to": "tg:moddemo-topics-tg",
+      "type": "routes_to",
+      "attrs": {
+        "listener_port": 80,
+        "protocol": "HTTP"
+      }
+    },
+    {
+      "from": "tg:moddemo-topics-tg",
+      "to": "ec2:moddemo-topics-app",
+      "type": "routes_to",
+      "attrs": {
+        "port": 8080
+      }
+    },
+    {
+      "from": "tg:moddemo-topics-tg",
+      "to": "ec2:moddemo-topics-app",
+      "type": "health_checks",
+      "attrs": {
+        "path": "/manage/health/readiness",
+        "port": 8080,
+        "state": "healthy"
+      }
+    },
+    {
+      "from": "sg:moddemo-topics-db",
+      "to": "rds:moddemo-topics-db",
+      "type": "allows_ingress",
+      "attrs": {
+        "scope": "attached"
+      }
+    },
+    {
+      "from": "ec2:moddemo-topics-app",
+      "to": "secret:moddemo-topics/db",
+      "type": "reads_secret",
+      "attrs": {
+        "key": "DB_PASSWORD"
+      }
+    },
+    {
+      "from": "zone:demo.internal",
+      "to": "dns:app.topics.demo.internal",
+      "type": "resolves_to",
+      "attrs": {
+        "scope": "contains"
+      }
+    },
+    {
+      "from": "dns:app.topics.demo.internal",
+      "to": "ec2:moddemo-topics-app",
+      "type": "resolves_to",
+      "attrs": {}
+    },
+    {
+      "from": "zone:demo.internal",
+      "to": "dns:db.topics.demo.internal",
+      "type": "resolves_to",
+      "attrs": {
+        "scope": "contains"
+      }
+    },
+    {
+      "from": "dns:db.topics.demo.internal",
+      "to": "rds:moddemo-topics-db",
+      "type": "resolves_to",
+      "attrs": {}
+    },
+    {
+      "from": "zone:demo.internal",
+      "to": "dns:lb.topics.demo.internal",
+      "type": "resolves_to",
+      "attrs": {
+        "scope": "contains"
+      }
+    },
+    {
+      "from": "dns:lb.topics.demo.internal",
+      "to": "alb:moddemo-topics-alb",
+      "type": "resolves_to",
+      "attrs": {}
+    },
+    {
+      "from": "ec2:moddemo-topics-app",
+      "to": "dns:db.topics.demo.internal",
+      "type": "connects_to_db",
+      "attrs": {
+        "host": "db.topics.demo.internal",
+        "port": 5432
+      }
+    },
+    {
+      "from": "ec2:moddemo-topics-app",
+      "to": "rds:moddemo-topics-db",
+      "type": "connects_to_db",
+      "attrs": {
+        "via": "db.topics.demo.internal",
+        "port": 5432
+      }
+    }
+  ]
+}

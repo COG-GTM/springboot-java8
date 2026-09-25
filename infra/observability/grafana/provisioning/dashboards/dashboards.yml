@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: topics
+    folder: Modernization
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards

@@ -1,0 +1,1 @@
+* * * * * sh /opt/report.sh >/proc/1/fd/1 2>&1

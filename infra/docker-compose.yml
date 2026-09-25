@@ -1,0 +1,175 @@
+# Stand-in for the real estate: LB (nginx), DNS (CoreDNS), firewall (iptables sidecar),
+# Postgres + a second DB consumer (reporting cron), file-based secrets, Prometheus + Grafana.
+name: topics
+
+networks:
+  topics-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+
+volumes:
+  pgdata:
+  reports:
+  grafana-data:
+
+services:
+  coredns:
+    image: coredns/coredns:1.11.3
+    command: ["-conf", "/etc/coredns/Corefile"]
+    volumes:
+      - ./dns/Corefile:/etc/coredns/Corefile:ro
+      - ./dns/hosts:/etc/coredns/hosts:ro
+    networks:
+      topics-net:
+        ipv4_address: 172.28.0.53
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: topics
+      POSTGRES_USER: topics
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U topics -d topics"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      topics-net:
+        ipv4_address: 172.28.0.10
+
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: ${RUNTIME_IMAGE:-eclipse-temurin:11-jre}
+    image: topics-api:${APP_VERSION:-0.1.0}
+    env_file:
+      - ./secrets/app.env
+    environment:
+      DB_URL: jdbc:postgresql://db.topics.internal:5432/topics
+      DB_USER: topics
+      DD_SERVICE: topics-api
+      DD_ENV: ${DD_ENV:-legacy}
+      DD_VERSION: ${APP_VERSION:-0.1.0}
+    labels:
+      com.datadoghq.tags.service: topics-api
+      com.datadoghq.tags.env: ${DD_ENV:-legacy}
+      com.datadoghq.tags.version: ${APP_VERSION:-0.1.0}
+    dns:
+      - 172.28.0.53
+    depends_on:
+      db:
+        condition: service_healthy
+      coredns:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/manage/health/readiness"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+    networks:
+      topics-net:
+        ipv4_address: 172.28.0.20
+
+  firewall:
+    build: ./firewall
+    network_mode: "service:app"
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./firewall/rules.conf:/etc/firewall/rules.conf:ro
+    depends_on:
+      - app
+
+  nginx:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./firewall/nginx-allowlist.conf:/etc/nginx/allowlist.conf:ro
+    ports:
+      - "8088:80"
+    dns:
+      - 172.28.0.53
+    depends_on:
+      - app
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks:
+      topics-net:
+        ipv4_address: 172.28.0.30
+
+  reporting:
+    image: postgres:16-alpine
+    env_file:
+      - ./secrets/app.env
+    environment:
+      PGHOST: db.topics.internal
+      PGUSER: topics
+      PGDATABASE: topics
+    volumes:
+      - ./reporting/report.sh:/opt/report.sh:ro
+      - ./reporting/crontab:/etc/crontabs/root:ro
+      - reports:/reports
+    command: ["sh", "-c", "sh /opt/report.sh; exec crond -f -l 2"]
+    dns:
+      - 172.28.0.53
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      topics-net:
+        ipv4_address: 172.28.0.11
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=2d
+    ports:
+      - "${PROMETHEUS_PORT:-9091}:9090"
+    dns:
+      - 172.28.0.53
+    networks:
+      topics-net:
+        ipv4_address: 172.28.0.40
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    dns:
+      - 172.28.0.53
+    depends_on:
+      - prometheus
+    networks:
+      topics-net:
+        ipv4_address: 172.28.0.41
+
+secrets:
+  db_password:
+    file: ./secrets/vault-stub/db_password

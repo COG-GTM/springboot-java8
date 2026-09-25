@@ -1,12 +1,29 @@
 package hello.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "topics")
 public class Topic {
+    @Id
     private String id;
+
+    @Column(nullable = false)
     private String subjectName;
+
+    @Column(nullable = false)
     private String subjectDescription;
 
     public Topic() {
+    }
+
+    public Topic(String id, String subjectName, String subjectDescription) {
+        this.id = id;
+        this.subjectName = subjectName;
+        this.subjectDescription = subjectDescription;
     }
 
     public String getId() {
@@ -33,11 +50,8 @@ public class Topic {
         this.subjectDescription = subjectDescription;
     }
 
-    public Topic(String id, String subjectName, String subjectDescription) {
-        super();
-        this.id = id;
-        this.subjectName = subjectName;
-        this.subjectDescription = subjectDescription;
+    @Override
+    public String toString() {
+        return "Topic{id='" + id + "', subjectName='" + subjectName + "', subjectDescription='" + subjectDescription + "'}";
     }
-
 }

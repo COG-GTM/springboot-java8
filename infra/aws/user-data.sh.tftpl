@@ -1,0 +1,47 @@
+#!/bin/bash
+# Boots the LEGACY topics-api container on an EC2 host. Mirrors infra/docker-compose.yml.
+set -euxo pipefail
+exec > >(tee /var/log/user-data.log | logger -t user-data) 2>&1
+
+dnf install -y docker jq
+systemctl enable --now docker
+
+REGION="${region}"
+aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "${ecr_registry}"
+
+# Secret contract: read the DB password from the legacy key name.
+SECRET_JSON=$(aws secretsmanager get-secret-value --region "$REGION" --secret-id "${secret_arn}" --query SecretString --output text)
+export DB_PASSWORD=$(echo "$SECRET_JSON" | jq -r '.${db_secret_key}')
+export DB_USER=$(echo "$SECRET_JSON" | jq -r '.DB_USER')
+
+# Schema is owned by infra (ddl-auto=validate). Apply once, idempotently.
+mkdir -p /opt/db-init
+cat > /opt/db-init/01-schema.sql <<'SQL'
+${schema_sql}
+SQL
+cat > /opt/db-init/02-seed.sql <<'SQL'
+${seed_sql}
+SQL
+cat > /opt/db-init/03-reporting.sql <<'SQL'
+${reporting_sql}
+SQL
+for i in $(seq 1 60); do
+  if docker run --rm -e PGPASSWORD="$DB_PASSWORD" postgres:16-alpine \
+       psql -h "${db_host}" -U "$DB_USER" -d topics -tAc "select 1" >/dev/null 2>&1; then break; fi
+  sleep 5
+done
+if ! docker run --rm -e PGPASSWORD="$DB_PASSWORD" postgres:16-alpine \
+     psql -h "${db_host}" -U "$DB_USER" -d topics -tAc "select 1 from topics limit 1" >/dev/null 2>&1; then
+  for f in 01-schema 02-seed 03-reporting; do
+    docker run --rm -e PGPASSWORD="$DB_PASSWORD" -v /opt/db-init:/init:ro postgres:16-alpine \
+      psql -h "${db_host}" -U "$DB_USER" -d topics -v ON_ERROR_STOP=1 -f /init/$f.sql
+  done
+fi
+
+docker pull "${app_image}"
+docker run -d --name topics-api --restart unless-stopped -p ${app_port}:8080 \
+  -e DB_URL="jdbc:postgresql://${db_host}:5432/topics" \
+  -e DB_USER="$DB_USER" -e DB_PASSWORD="$DB_PASSWORD" \
+  -e DD_SERVICE=topics-api -e DD_ENV=legacy-aws -e DD_VERSION=0.1.0 \
+  -l com.datadoghq.tags.env=legacy-aws \
+  "${app_image}"
