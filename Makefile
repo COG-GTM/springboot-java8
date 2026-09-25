@@ -56,7 +56,10 @@ smoke: health
 	@echo "== smoke: DNS from app network =="
 	@$(COMPOSE) exec -T app sh -c 'getent hosts db.topics.internal app.topics.internal lb.topics.internal'
 	@echo "== smoke: prometheus target up =="
-	@curl -fsS '$(PROM_URL)/api/v1/query?query=up%7Bjob%3D%22topics-api%22%7D' | grep -q '"value":\[[0-9.]*,"1"\]'
+	@for i in $$(seq 1 12); do \
+	  curl -fsS '$(PROM_URL)/api/v1/query?query=up%7Bjob%3D%22topics-api%22%7D' | grep -q '"value":\[[0-9.]*,"1"\]' && break; \
+	  [ $$i -eq 12 ] && echo "prometheus target topics-api never came up" && exit 1; sleep 5; \
+	done
 	@echo "smoke OK"
 
 # Run k6 inside the compose network so the LB is reached through the DNS name.
