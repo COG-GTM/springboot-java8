@@ -2,22 +2,14 @@ package hello.controller;
 
 import hello.declaration.TimeClient;
 import hello.model.SimpleTimeClient;
-import hello.model.Topic;
 import hello.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.chrono.ChronoPeriod;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 @RestController
 public class HelloController {
@@ -46,14 +38,13 @@ public class HelloController {
     @RequestMapping("/datetime")
     public String index() {
         TimeClient myTimeClient = new SimpleTimeClient();
-        LocalDateTime localDateTime = LocalDateTime.now();
         return "Greetings from Spring Boot! ----------------------" +
                 "Datetime now is " + String.valueOf(myTimeClient.toString()) + "----------------------" +
                 "Datetime tomorrow will be " + String.valueOf(myTimeClient.getLocalDateTime().plusDays(1)) + "----------------------" +
                 "Datetime of previous month was " + String.valueOf(myTimeClient.getLocalDateTime().minus(1, ChronoUnit.MONTHS)) + "----------------------" +
                 "Is this a leap year ?  " + String.valueOf(LocalDate.now().isLeapYear()) + "----------------------" +
                 "Default system zone id   " + String.valueOf(ZoneId.systemDefault()) + "-------------------" +
-                "Time in California: " + myTimeClient.getZonedDateTime("Canada/Central").toString();
+                "Time in Winnipeg: " + myTimeClient.getZonedDateTime("America/Winnipeg").toString();
 
     }
 
