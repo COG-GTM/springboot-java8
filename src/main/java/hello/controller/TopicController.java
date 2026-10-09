@@ -3,7 +3,9 @@ package hello.controller;
 import hello.model.Topic;
 import hello.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -49,7 +51,9 @@ public class TopicController {
      */
     @RequestMapping(method = RequestMethod.PUT, value = "/topic/{id}")
     public void updateTopic(@PathVariable String id, @RequestBody Topic topic) {
-        topicService.updateTopic(id, topic);
+        if (!topicService.updateTopic(id, topic)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found: " + id);
+        }
     }
 
 
