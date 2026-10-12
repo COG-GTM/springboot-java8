@@ -32,7 +32,7 @@ public interface TimeClient {
 
 
     default ZonedDateTime getZonedDateTime(String zoneString) {
-        return ZonedDateTime.of(getLocalDateTime(), getZoneId(zoneString));
+        return getLocalDateTime().atZone(ZoneId.systemDefault()).withZoneSameInstant(getZoneId(zoneString));
     }
 
 }
