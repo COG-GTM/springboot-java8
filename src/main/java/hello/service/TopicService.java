@@ -46,7 +46,7 @@ public class TopicService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found: " + id));
     }
 
-    public void addTopic(Topic topic) {
+    public synchronized void addTopic(Topic topic) {
         topics.add(topic);
     }
 
@@ -66,7 +66,7 @@ public class TopicService {
      *
      * @param id
      */
-    public void deleteTopic(String id) {
+    public synchronized void deleteTopic(String id) {
         topics.removeIf(topic -> topic.getId().equals(id));
     }
 
