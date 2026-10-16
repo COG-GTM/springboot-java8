@@ -2,14 +2,20 @@ package hello.service;
 
 import hello.declaration.CustomPredicate;
 import hello.model.Topic;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -19,14 +25,14 @@ import java.util.stream.Stream;
 public class TopicService {
 
 
-    private List<Topic> topics = new ArrayList<>(Arrays.asList(
+    private final List<Topic> topics = new CopyOnWriteArrayList<>(Arrays.asList(
             new Topic("spring", "Spring Framework", "Spring Framework Description"),
             new Topic("java", "Core Java", "Java Description"),
             new Topic("javascript", "javascript Framework", "javascript Framework Description")
     ));
 
     public List<Topic> getAllTopics() {
-        return topics;
+        return new ArrayList<>(topics);
     }
 
     /**
@@ -36,10 +42,11 @@ public class TopicService {
      * @return
      */
     public Topic getTopicWithId(String id) {
-        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst().get();
+        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found: " + id));
     }
 
-    public void addTopic(Topic topic) {
+    public synchronized void addTopic(Topic topic) {
         topics.add(topic);
     }
 
@@ -49,7 +56,7 @@ public class TopicService {
      * @param id
      * @param topic
      */
-    public void updateTopic(String id, Topic topic) {
+    public synchronized void updateTopic(String id, Topic topic) {
         OptionalInt indexOfElement = IntStream.range(0, topics.size()).filter(index -> id.equals(topics.get(index).getId())).findFirst();
         if (indexOfElement.isPresent()) topics.set(indexOfElement.getAsInt(), topic);
     }
@@ -59,7 +66,7 @@ public class TopicService {
      *
      * @param id
      */
-    public void deleteTopic(String id) {
+    public synchronized void deleteTopic(String id) {
         topics.removeIf(topic -> topic.getId().equals(id));
     }
 
@@ -96,8 +103,9 @@ public class TopicService {
      * @return
      */
     public List<Topic> sortTopicsWithID() {
-        topics.sort(Comparator.comparing(Topic::getId));
-        return topics;
+        List<Topic> sorted = new ArrayList<>(topics);
+        sorted.sort(Comparator.comparing(Topic::getId));
+        return sorted;
     }
 
 
@@ -186,7 +194,7 @@ public class TopicService {
         Path start = Paths.get("");
         int maxDepth = 25;
         try (Stream<Path> stream = Files.find(start, maxDepth, (path, attr) ->
-                String.valueOf(path).startsWith("grad"))) {
+                path.getFileName() != null && path.getFileName().toString().startsWith("grad"))) {
             String joined = stream
                     .sorted()
                     .map(String::valueOf)
@@ -223,13 +231,15 @@ public class TopicService {
      * @return
      */
     public String readFileWithStreamFunction() {
-        Path path = Paths.get("temp.txt");
-        System.out.println();
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
+        InputStream input = TopicService.class.getResourceAsStream("/temp.txt");
+        if (input == null) {
+            return " IO exception ";
+        }
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
             String lines = reader
                     .lines()
                     .filter(line->line.contains("print"))
-                    .map(line->line.substring("print".length()))
+                    .map(line->line.substring(line.indexOf("print") + "print".length()))
                     .collect(Collectors.joining(","));
             return  lines;
         } catch (IOException e) {
