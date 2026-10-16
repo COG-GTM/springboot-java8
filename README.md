@@ -76,7 +76,7 @@ GET /datetime
 
 ### Prerequisites
 
-1) Java sdk
+1) JDK 21 (Spring Boot 3.5.x; Java 17 is the minimum)
 2) POSTMAN
 
 ### Installing
@@ -85,8 +85,8 @@ GET /datetime
 
 ```
 1) Download or clone
-2) Import the project
-3) Run on location machine
+2) Build and test: ./mvnw clean verify
+3) Run: ./mvnw spring-boot:run
 4) Open Postman, to call API's (  localhost:8080 )
 ```
 
