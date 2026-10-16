@@ -2,7 +2,9 @@ package hello.service;
 
 import hello.declaration.CustomPredicate;
 import hello.model.Topic;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,7 +38,8 @@ public class TopicService {
      * @return
      */
     public Topic getTopicWithId(String id) {
-        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst().get();
+        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found: " + id));
     }
 
     public void addTopic(Topic topic) {
