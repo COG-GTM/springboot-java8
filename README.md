@@ -76,8 +76,10 @@ GET /datetime
 
 ### Prerequisites
 
-1) Java sdk
+1) Java 21 (Spring Boot 3.5.x)
 2) POSTMAN
+
+Run with `./mvnw spring-boot:run` or `./gradlew bootRun`.
 
 ### Installing
 

@@ -1,6 +1,5 @@
 package hello.service;
 
-import hello.declaration.CustomPredicate;
 import hello.model.Topic;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -81,7 +81,7 @@ public class TopicService {
      * @param tester
      * @return
      */
-    private static List<Topic> printTopicsWithPredicate(List<Topic> topicList, CustomPredicate<Topic> tester) {
+    private static List<Topic> printTopicsWithPredicate(List<Topic> topicList, Predicate<Topic> tester) {
         List<Topic> resultTopic = new ArrayList<>();
         topicList.forEach(topic -> {
             if (tester.test(topic)) resultTopic.add(topic);
