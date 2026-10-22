@@ -24,7 +24,8 @@
 - **Run the build on JDK 8.** Spring Boot 2.0.2's `spring-boot-starter-test` ships JUnit **4.12** and Mockito 2.15; on JDK 17 any `mock(...)` / `@MockBean` fails with `Could not find sun.misc.Unsafe`. Set `JAVA_HOME` to a JDK 8 install (e.g. `/usr/lib/jvm/java-8-openjdk-amd64`). Gradle 4.6 also does not run on JDK 11+.
 - **Tests are JUnit 4**: `org.junit.Test`, `@RunWith(SpringRunner.class)`, `@Test(expected = ...)`. Do not add JUnit 5 / `@ExtendWith` unless you also upgrade Spring Boot (out of scope).
 - If a machine-wide Gradle init script (in `~/.gradle/init.d/`) uses APIs newer than Gradle 4.6 and breaks the build, run Gradle with a clean `GRADLE_USER_HOME` that contains only a repository-mirror init script.
-- `Application` registers a `CommandLineRunner` bean that calls `http://gturnquist-quoters.cfapps.io/api/random` (host is no longer live) and then calls `quote.toString()`. Any `@SpringBootTest` that loads the full context must `@MockBean RestTemplate` and stub `getForObject(..., Quote.class)` to return a `Quote`, otherwise context startup fails. Prefer `@WebMvcTest` slices for controllers.
+- `Application` registers a `CommandLineRunner` bean that calls `http://gturnquist-quoters.cfapps.io/api/random` (host is no longer live) and then calls `quote.toString()`. Runners execute **during context startup, before `@Before`**, so `@MockBean RestTemplate` stubbed in `@Before` still returns `null` and the context fails with an NPE. Full-context tests must supply a RestTemplate that is stubbed **before** startup — a nested `@TestConfiguration` with a `@Bean @Primary RestTemplate` that returns a `Mockito.mock(RestTemplate.class)` already stubbed to return `new Quote()` from `getForObject(anyString(), eq(Quote.class))`. Prefer `@WebMvcTest` slices for controllers.
+- `Application.main` builds its own `new RestTemplate()` and calls the same offline host, so it cannot be tested without network access or a production change. Exclude `main` from direct tests and list it as a known gap.
 - `TopicService` keeps topics in an **instance-level mutable list** and several methods mutate it (`addTopic`, `updateTopic`, `deleteTopic`, `sortTopicsWithID`). Use a fresh `new TopicService()` per test so tests are order-independent.
 - `TopicService`'s file methods use paths relative to the working directory (`Paths.get("")`, `temp.txt` at the repo root). Maven Surefire and Gradle both run tests from the project root, so assertions can rely on `temp.txt` and the `gradle*` files existing there — do not move or edit those files.
 
@@ -87,8 +88,12 @@ Requirements:
 - Controllers: @RunWith(SpringRunner.class) + @WebMvcTest(<Controller>.class) with MockMvc and
   @MockBean for TopicService. Assert status codes, JSON bodies, and service interactions (Mockito verify).
 - Services: plain unit tests on a fresh `new TopicService()` per test (the service holds mutable state).
-- Full-context tests (@SpringBootTest) must @MockBean RestTemplate and stub getForObject(..., Quote.class)
-  to return a Quote, because Application's CommandLineRunner calls an external host that is offline.
+- Full-context tests (@SpringBootTest): Application's CommandLineRunner calls an offline host during
+  context startup, before @Before runs, so a @MockBean stubbed in @Before is too late (NPE). Add a nested
+  @TestConfiguration with a @Bean @Primary RestTemplate that returns a Mockito mock already stubbed:
+  when(mock.getForObject(anyString(), eq(Quote.class))).thenReturn(new Quote()).
+- Do not call Application.main from tests: it creates its own RestTemplate and makes a real network
+  call. Report it as an untestable gap.
 - Use JUnit 4 (org.junit.Test, @Test(expected=...)), Mockito, AssertJ/Hamcrest — all provided by
   spring-boot-starter-test. Do not add dependencies.
 - Use JDK 8 (JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 or equivalent). Mockito fails on JDK 17
@@ -144,7 +149,7 @@ Rules:
 - **Unit D — declaration + app**
   - `TimeClient.getZoneId`: valid zone, invalid zone falls back to `ZoneId.systemDefault()`; default `getZonedDateTime` via `SimpleTimeClient` or a minimal anonymous `TimeClient` implementation.
   - `CustomPredicate`: lambda implementation true/false cases.
-  - `Application`: context loads with `RestTemplate` mocked; `run(...)` creates the `customers` table in H2 and inserts 4 rows (query via `JdbcTemplate`); `restTemplate(...)` bean is created.
+  - `Application`: context loads with the pre-stubbed `@Primary RestTemplate` from a nested `@TestConfiguration`; `run(...)` creates the `customers` table in H2 and inserts 4 rows (`select count(*) from customers` via `JdbcTemplate` returns 4); the quote runner's `getForObject` was invoked once (`verify`). `main` is excluded and listed as a gap.
 
 ### Known bug candidates to verify and flag (do not fix)
 
@@ -167,7 +172,7 @@ Rules:
    - Tests added per class (test class, test count, notable cases).
    - Line and branch coverage per class and overall.
    - Bugs found — a separate section, with the `// BUG:` test that documents each one.
-   - Remaining gaps (uncovered lines/branches and why), failed or retried units, and follow-ups.
+   - Remaining gaps (uncovered lines/branches and why — at minimum `Application.main`), failed or retried units, and follow-ups.
    - A per-unit table: unit, child session, branch, tests added, pass/fail.
 6. **PR.** Open one PR from the base branch with the build changes, the generated tests, and `TEST_GENERATION_SUMMARY.md`. Include the commands used to run the suite and the overall coverage number in the description.
 
