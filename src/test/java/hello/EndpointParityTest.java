@@ -128,6 +128,7 @@ public class EndpointParityTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertTrue(response.getBody().contains("\"status\":500"), response.getBody());
         assertTrue(response.getBody().contains("\"path\":\"/topic/does-not-exist\""), response.getBody());
+        assertTrue(response.getBody().contains("\"message\":\"No value present\""), response.getBody());
     }
 
     @Test
