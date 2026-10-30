@@ -29,7 +29,7 @@ public class ApplicationStartupTest {
         List<String> joshes = jdbcTemplate.queryForList(
                 "SELECT last_name FROM customers WHERE first_name = 'Josh' ORDER BY id", String.class);
         assertEquals(2, joshes.size());
-        assertEquals("Bloch", joshes.get(0));
+        assertEquals("Bloch", joshes.getFirst());
         assertEquals("Long", joshes.get(1));
     }
 
@@ -37,7 +37,7 @@ public class ApplicationStartupTest {
     public void customerIdsAreGeneratedSequentially() {
         List<Long> ids = jdbcTemplate.queryForList("SELECT id FROM customers ORDER BY id", Long.class);
         assertEquals(4, ids.size());
-        assertEquals(Long.valueOf(1), ids.get(0));
+        assertEquals(Long.valueOf(1), ids.getFirst());
         assertEquals(Long.valueOf(4), ids.get(3));
     }
 
