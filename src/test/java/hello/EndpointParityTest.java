@@ -1,7 +1,6 @@
 package hello;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -13,17 +12,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Characterization tests: expected bodies are the responses captured from the original
  * Java 8 / Spring Boot 2.0.2 build, so any behaviour change during the upgrade fails here.
  * The context is reset after each test because TopicService and the greeting counter are stateful.
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(QuoteServiceStub.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -87,13 +84,13 @@ public class EndpointParityTest {
         ResponseEntity<String> response = rest.getForEntity("/topic/file/operation", String.class);
         assertText(response);
         String body = response.getBody();
-        assertTrue(body, body.startsWith("---------Find all files in path and sort:    "));
-        assertTrue(body, body.contains("pom.xml; "));
-        assertTrue(body, body.contains("temp.txt"));
-        assertTrue(body, body.contains("sort : gradle; gradle/wrapper; gradle/wrapper/gradle-wrapper.jar; "
-                + "gradle/wrapper/gradle-wrapper.properties; gradlew; gradlew.bat"));
-        assertTrue(body, body.contains("with walk functiongradle; gradle/wrapper; "));
-        assertTrue(body, body.endsWith("having \"print\" witin it:   Hello, this, is, Rehman"));
+        assertTrue(body.startsWith("---------Find all files in path and sort:    "), body);
+        assertTrue(body.contains("pom.xml; "), body);
+        assertTrue(body.contains("temp.txt"), body);
+        assertTrue(body.contains("sort : gradle; gradle/wrapper; gradle/wrapper/gradle-wrapper.jar; "
+                + "gradle/wrapper/gradle-wrapper.properties; gradlew; gradlew.bat"), body);
+        assertTrue(body.contains("with walk functiongradle; gradle/wrapper; "), body);
+        assertTrue(body.endsWith("having \"print\" witin it:   Hello, this, is, Rehman"), body);
     }
 
     @Test
@@ -101,9 +98,9 @@ public class EndpointParityTest {
         ResponseEntity<String> response = rest.getForEntity("/datetime", String.class);
         assertText(response);
         String body = response.getBody();
-        assertTrue(body, body.matches("Greetings from Spring Boot! -+Datetime now is \\S+-+Datetime tomorrow will be \\S+"
+        assertTrue(body.matches("Greetings from Spring Boot! -+Datetime now is \\S+-+Datetime tomorrow will be \\S+"
                 + "-+Datetime of previous month was \\S+-+Is this a leap year \\?  (true|false)"
-                + "-+Default system zone id   \\S+-+Time in California: \\S+\\[Canada/Central]"));
+                + "-+Default system zone id   \\S+-+Time in California: \\S+\\[Canada/Central]"), body);
     }
 
     @Test
@@ -129,8 +126,8 @@ public class EndpointParityTest {
     public void unknownTopicIdIsServerError() {
         ResponseEntity<String> response = rest.getForEntity("/topic/does-not-exist", String.class);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertTrue(response.getBody(), response.getBody().contains("\"status\":500"));
-        assertTrue(response.getBody(), response.getBody().contains("\"path\":\"/topic/does-not-exist\""));
+        assertTrue(response.getBody().contains("\"status\":500"), response.getBody());
+        assertTrue(response.getBody().contains("\"path\":\"/topic/does-not-exist\""), response.getBody());
     }
 
     @Test

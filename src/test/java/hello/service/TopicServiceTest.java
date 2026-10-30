@@ -1,19 +1,20 @@
 package hello.service;
 
 import hello.model.Topic;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TopicServiceTest {
 
     private TopicService service;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         service = new TopicService();
     }
@@ -57,9 +58,10 @@ public class TopicServiceTest {
         assertEquals("[spring]", service.findIdHavingCharacter());
     }
 
-    @Test(expected = java.util.NoSuchElementException.class)
+    @Test
     public void getTopicWithUnknownIdThrows() {
-        service.getTopicWithId("missing");
+        assertThrows(java.util.NoSuchElementException.class, () ->
+            service.getTopicWithId("missing"));
     }
 
     private static String ids(List<Topic> topics) {
