@@ -80,8 +80,9 @@ public class Application implements CommandLineRunner {
 
         log.info("Querying for customer records where first_name = 'Josh':");
         jdbcTemplate.query(
-                "SELECT id, first_name, last_name FROM customers WHERE first_name = ?", new Object[]{"Josh"},
-                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
+                "SELECT id, first_name, last_name FROM customers WHERE first_name = ?",
+                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name")),
+                "Josh"
         ).forEach(customer -> log.info(customer.toString()));
 
     }

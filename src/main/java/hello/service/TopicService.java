@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -166,7 +165,7 @@ public class TopicService {
      * @return
      */
     public String findAllFilesInPathAndSort() {
-        try (Stream<Path> stream = Files.list(Paths.get(""))) {
+        try (Stream<Path> stream = Files.list(Path.of(""))) {
             String joined = stream
                     .map(String::valueOf)
                     .filter(path -> !path.startsWith("."))
@@ -183,7 +182,7 @@ public class TopicService {
      * @return
      */
     public String findParticularFileInPathAndSort() {
-        Path start = Paths.get("");
+        Path start = Path.of("");
         int maxDepth = 25;
         try (Stream<Path> stream = Files.find(start, maxDepth, (path, attr) ->
                 String.valueOf(path).startsWith("grad"))) {
@@ -203,7 +202,7 @@ public class TopicService {
      * @return
      */
     public String findParticularFileInPathAndSortWithWalkFunction() {
-        Path start = Paths.get("");
+        Path start = Path.of("");
         int maxDepth = 5;
         try (Stream<Path> stream = Files.walk(start, maxDepth)) {
             String joined = stream
@@ -223,7 +222,7 @@ public class TopicService {
      * @return
      */
     public String readFileWithStreamFunction() {
-        Path path = Paths.get("temp.txt");
+        Path path = Path.of("temp.txt");
         System.out.println();
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String lines = reader

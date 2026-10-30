@@ -37,7 +37,7 @@ public class TopicController {
      * Add a new topic in list
      * @param topic
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/topic")
+    @PostMapping("/topic")
     public void addTopic(@RequestBody Topic topic) {
         topicService.addTopic(topic);
     }
@@ -47,7 +47,7 @@ public class TopicController {
      * @param id
      * @param topic
      */
-    @RequestMapping(method = RequestMethod.PUT, value = "/topic/{id}")
+    @PutMapping("/topic/{id}")
     public void updateTopic(@PathVariable String id, @RequestBody Topic topic) {
         topicService.updateTopic(id, topic);
     }
@@ -57,7 +57,7 @@ public class TopicController {
      * Delete a topic with ID
      * @param id
      */
-    @RequestMapping(method = RequestMethod.DELETE, value = "/topic/{id}")
+    @DeleteMapping("/topic/{id}")
     public void deleteTopic(@PathVariable String id) {
         topicService.deleteTopic(id);
     }
