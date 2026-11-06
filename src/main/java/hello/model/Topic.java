@@ -1,7 +1,13 @@
 package hello.model;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 public class Topic {
+    @NotBlank
+    @Size(max = 64)
+    @Pattern(regexp = "^[A-Za-z0-9_-]+$")
     private String id;
     private String subjectName;
     private String subjectDescription;
