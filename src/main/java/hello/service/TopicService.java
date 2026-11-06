@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -18,8 +19,11 @@ import java.util.stream.Stream;
 @Service
 public class TopicService {
 
+    public static final int MAX_TOPICS = 1000;
 
-    private List<Topic> topics = new ArrayList<>(Arrays.asList(
+    private static final Pattern ID_CHARACTER_PATTERN = Pattern.compile("g");
+
+    private final List<Topic> topics = new CopyOnWriteArrayList<>(Arrays.asList(
             new Topic("spring", "Spring Framework", "Spring Framework Description"),
             new Topic("java", "Core Java", "Java Description"),
             new Topic("javascript", "javascript Framework", "javascript Framework Description")
@@ -39,7 +43,10 @@ public class TopicService {
         return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst().get();
     }
 
-    public void addTopic(Topic topic) {
+    public synchronized void addTopic(Topic topic) {
+        if (topics.size() >= MAX_TOPICS) {
+            throw new TopicStoreFullException(MAX_TOPICS);
+        }
         topics.add(topic);
     }
 
@@ -146,13 +153,12 @@ public class TopicService {
      * @return
      */
     public String findIdHavingCharacter() {
-        Pattern pattern = Pattern.compile(".*g.*");
         Object[] topicIdObjectList = topics.stream().map(topic -> topic.getId()).collect(Collectors.toList()).toArray();
 
         String[] topicIdList = Arrays.stream(topicIdObjectList).toArray(String[]::new);
 
         return Stream.of(topicIdList)
-                .filter(pattern.asPredicate())
+                .filter(ID_CHARACTER_PATTERN.asPredicate())
                 .collect(Collectors.toList())
                 .toString();
     }
