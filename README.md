@@ -63,10 +63,6 @@ String Operations on Topic List
 GET /topic/string/operation
 ```
 
-File Operations on Topic List
-```
-GET /topic/file/operation
-```
 Java 8 Date Time example
 ```
 GET /datetime
