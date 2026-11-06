@@ -7,7 +7,7 @@ public class Quote {
     @Override
     public String toString() {
         return "Quote{" +
-                "type='" + type + '\'' +
+                "type='" + LogText.clean(type) + '\'' +
                 ", value=" + value +
                 '}';
     }
