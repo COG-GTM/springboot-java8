@@ -1,7 +1,11 @@
 package hello.model;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 public class Topic {
+    @NotBlank
+    @Size(max = 64)
     private String id;
     private String subjectName;
     private String subjectDescription;

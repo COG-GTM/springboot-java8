@@ -36,10 +36,11 @@ public class TopicService {
      * @return
      */
     public Topic getTopicWithId(String id) {
-        return topics.stream().filter(topic -> topic.getId().equals(id)).findFirst().get();
+        return topics.stream().filter(topic -> Objects.equals(id, topic.getId())).findFirst().get();
     }
 
     public void addTopic(Topic topic) {
+        requireId(topic);
         topics.add(topic);
     }
 
@@ -50,7 +51,8 @@ public class TopicService {
      * @param topic
      */
     public void updateTopic(String id, Topic topic) {
-        OptionalInt indexOfElement = IntStream.range(0, topics.size()).filter(index -> id.equals(topics.get(index).getId())).findFirst();
+        requireId(topic);
+        OptionalInt indexOfElement = IntStream.range(0, topics.size()).filter(index -> Objects.equals(id, topics.get(index).getId())).findFirst();
         if (indexOfElement.isPresent()) topics.set(indexOfElement.getAsInt(), topic);
     }
 
@@ -60,7 +62,7 @@ public class TopicService {
      * @param id
      */
     public void deleteTopic(String id) {
-        topics.removeIf(topic -> topic.getId().equals(id));
+        topics.removeIf(topic -> Objects.equals(id, topic.getId()));
     }
 
     /**
@@ -70,7 +72,7 @@ public class TopicService {
      * @return
      */
     public List<Topic> filterMinimumLengthForId(Integer minLength) {
-        return printTopicsWithPredicate(topics, topic -> topic.getId().length() > minLength);
+        return printTopicsWithPredicate(topics, topic -> topic.getId() != null && topic.getId().length() > minLength);
     }
 
 
@@ -96,7 +98,7 @@ public class TopicService {
      * @return
      */
     public List<Topic> sortTopicsWithID() {
-        topics.sort(Comparator.comparing(Topic::getId));
+        topics.sort(Comparator.comparing(Topic::getId, Comparator.nullsFirst(Comparator.naturalOrder())));
         return topics;
     }
 
@@ -107,7 +109,7 @@ public class TopicService {
      * @return
      */
     public String returnAllTopicIDWithStringSlicing() {
-        List<String> topicIds = topics.stream().map(topic -> topic.getId()).collect(Collectors.toList());
+        List<String> topicIds = topics.stream().map(Topic::getId).filter(Objects::nonNull).collect(Collectors.toList());
         return String.join(":", topicIds);
     }
 
@@ -147,7 +149,7 @@ public class TopicService {
      */
     public String findIdHavingCharacter() {
         Pattern pattern = Pattern.compile(".*g.*");
-        Object[] topicIdObjectList = topics.stream().map(topic -> topic.getId()).collect(Collectors.toList()).toArray();
+        Object[] topicIdObjectList = topics.stream().map(Topic::getId).filter(Objects::nonNull).collect(Collectors.toList()).toArray();
 
         String[] topicIdList = Arrays.stream(topicIdObjectList).toArray(String[]::new);
 
@@ -155,6 +157,13 @@ public class TopicService {
                 .filter(pattern.asPredicate())
                 .collect(Collectors.toList())
                 .toString();
+    }
+
+
+    private static void requireId(Topic topic) {
+        if (topic == null || topic.getId() == null || topic.getId().trim().isEmpty()) {
+            throw new IllegalArgumentException("Topic id must not be blank");
+        }
     }
 
 
