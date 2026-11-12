@@ -248,6 +248,10 @@
                 toast('ID and subject name are required', 'err');
                 return;
             }
+            if (topic.id.indexOf('/') !== -1 || topic.id === 'sort') {
+                toast('ID cannot contain "/" or be "sort"', 'err');
+                return;
+            }
             request('GET', '/topic').then(function (all) {
                 if ((all || []).some(function (t) { return t.id === topic.id; })) {
                     throw new Error('A topic with ID "' + topic.id + '" already exists');
