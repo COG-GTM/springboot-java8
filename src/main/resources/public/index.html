@@ -305,6 +305,7 @@
         searchEl.addEventListener('input', render);
 
         document.getElementById('sort-btn').addEventListener('click', function () {
+            minLengthEl.value = '';
             load('/topic/sort', 'Sorted by ID');
         });
 
