@@ -20,6 +20,19 @@ In addition, it uses
 1) Download or clone the project with link 
 (https://github.com/RehmanMuradAli/springboot-java8/)
 
+## Running the app
+Requires JDK 8 (Spring Boot 2.0.x does not start on JDK 17+).
+```
+export JAVA_HOME=/path/to/jdk8
+mvn clean package
+java -jar target/gs-spring-boot-0.1.0.jar
+```
+
+## Topic Manager UI
+Open http://localhost:8080/index.html to browse, search, add, edit and delete topics,
+sort them by ID and filter by minimum ID length. The page is a static file
+(`src/main/resources/public/index.html`) that calls the `/topic` APIs below.
+
 ## Available API's
 
 Greetings
