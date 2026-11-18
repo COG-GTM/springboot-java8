@@ -9,7 +9,7 @@ against the Java 8 / Spring Boot 2 build and the Java 21 / Spring Boot 3 build.
 """
 import argparse
 import datetime
-import difflib
+import fnmatch
 import http.client
 import json
 import os
@@ -25,6 +25,9 @@ import zipfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 COMPARED_HEADERS = ["content-type", "allow"]
+# Printed by Application.main() after SpringApplication.run() returns, i.e. after all
+# CommandLineRunners finished, so startup output is complete before requests start.
+READY_MARKER = "Let's inspect the beans provided by Spring Boot"
 JVM_OPTS = ["-Duser.timezone=UTC", "-Duser.language=en", "-Duser.country=US", "-Dfile.encoding=UTF-8"]
 
 # Normalisation applied identically to both sides. Values that legitimately
@@ -118,7 +121,7 @@ def start_app(java, jar, workdir, port, log_path):
     while time.time() < deadline:
         if proc.poll() is not None:
             raise SystemExit("app exited during startup, see %s" % log_path)
-        if "Started Application" in open(log_path, errors="replace").read():
+        if READY_MARKER in open(log_path, errors="replace").read():
             return proc
         time.sleep(0.25)
     proc.kill()
@@ -216,35 +219,74 @@ def capture(args):
 
 # --------------------------------------------------------------------------- compare
 def step_diffs(b, c):
+    """Return [(field, baseline_value, candidate_value)] for one request."""
     diffs = []
     if b["status"] != c["status"]:
-        diffs.append("status %s -> %s" % (b["status"], c["status"]))
+        diffs.append(("status", b["status"], c["status"]))
     for h in COMPARED_HEADERS:
         if b["headers"].get(h) != c["headers"].get(h):
-            diffs.append("%s %r -> %r" % (h, b["headers"].get(h), c["headers"].get(h)))
+            diffs.append((h, b["headers"].get(h), c["headers"].get(h)))
     if b["body_normalized"] != c["body_normalized"]:
-        diffs.append("body")
+        diffs.append(("body", b["body_normalized"], c["body_normalized"]))
     return diffs
+
+
+def only_error_message_differs(bb, cb):
+    try:
+        bj, cj = json.loads(bb), json.loads(cb)
+    except ValueError:
+        return False
+    if not (isinstance(bj, dict) and isinstance(cj, dict) and "message" in bj and "message" in cj):
+        return False
+    strip = lambda d: {k: v for k, v in d.items() if k != "message"}
+    return list(bj) == list(cj) and strip(bj) == strip(cj)
+
+
+def accepting_rule(key, diff, rules):
+    field, bv, cv = diff
+    for r in rules:
+        if not fnmatch.fnmatch(key, r["steps"]):
+            continue
+        if r["field"] == "error-message":
+            if field == "body" and only_error_message_differs(bv, cv):
+                return r
+        elif r["field"] == field and r.get("baseline", bv) == bv and r.get("candidate", cv) == cv:
+            return r
+    return None
+
+
+def describe(diff):
+    field, bv, cv = diff
+    return "body" if field == "body" else "%s %r -> %r" % (field, bv, cv)
 
 
 def md_escape(s):
     return s.replace("|", "\\|").replace("\n", " ")
 
 
+def diff_block(w, bv, cv):
+    w("")
+    w("```diff")
+    w("- " + bv)
+    w("+ " + cv)
+    w("```")
+
+
 def compare(args):
     base = json.load(open(args.baseline))
     cand = json.load(open(args.candidate))
-    rows, failures = [], []
-    total = matched = 0
+    rules = json.load(open(args.accepted))["rules"] if args.accepted else []
+    rows, failures, accepted = [], [], []
+    total = identical = 0
     cand_by_name = {s["name"]: s for s in cand["scenarios"]}
     for bs in base["scenarios"]:
         cs = cand_by_name.get(bs["name"])
         if cs is None:
-            failures.append(("%s/*" % bs["name"], ["scenario missing in candidate"], None, None))
+            failures.append(("%s/*" % bs["name"], [("scenario", "present", "missing")]))
             continue
         if bs["startup_customers"] != cs["startup_customers"]:
-            failures.append(("%s/startup" % bs["name"], ["startup JDBC output differs"],
-                             "\n".join(bs["startup_customers"]), "\n".join(cs["startup_customers"])))
+            failures.append(("%s/startup" % bs["name"], [("startup JDBC output", "\n".join(bs["startup_customers"]),
+                                                          "\n".join(cs["startup_customers"]))]))
         cand_steps = {s["id"]: s for s in cs["steps"]}
         for st in bs["steps"]:
             total += 1
@@ -252,15 +294,21 @@ def compare(args):
             ct = cand_steps.get(st["id"])
             b = st["response"]
             if ct is None:
-                failures.append((key, ["step missing in candidate"], None, None))
-                rows.append((bs["name"], st, b, None, False))
+                failures.append((key, [("step", "present", "missing")]))
+                rows.append((bs["name"], st, b, None, "**MISSING**"))
                 continue
-            d = step_diffs(b, ct["response"])
-            if d:
-                failures.append((key, d, b["body_normalized"], ct["response"]["body_normalized"]))
+            diffs = step_diffs(b, ct["response"])
+            unexplained = [d for d in diffs if not accepting_rule(key, d, rules)]
+            if not diffs:
+                identical += 1
+                verdict = "identical"
+            elif unexplained:
+                failures.append((key, unexplained))
+                verdict = "**DIFFERENT**"
             else:
-                matched += 1
-            rows.append((bs["name"], st, b, ct["response"], not d))
+                accepted.append((key, [(d, accepting_rule(key, d, rules)) for d in diffs]))
+                verdict = "accepted: " + ", ".join(sorted({accepting_rule(key, d, rules)["id"] for d in diffs}))
+            rows.append((bs["name"], st, b, ct["response"], verdict))
 
     endpoint_rows = []
     uncovered = []
@@ -277,10 +325,14 @@ def compare(args):
     w = out.append
     w("# REST parity report: %s vs %s" % (base["meta"]["label"], cand["meta"]["label"]))
     w("")
-    w("**Result: %s** - %d/%d responses identical after normalisation, %d/%d endpoints covered, "
-      "endpoint inventory %s." % ("PASS" if ok else "FAIL", matched, total,
-                                  len(endpoint_rows) - len(uncovered), len(endpoint_rows),
-                                  "identical" if inventory_same else "DIFFERS"))
+    w("**Result: %s**" % ("PASS" if ok else "FAIL"))
+    w("")
+    w("- %d requests replayed in %d scenarios: %d identical, %d accepted differences, %d unexplained differences."
+      % (total, len(base["scenarios"]), identical, len(accepted), total - identical - len(accepted)))
+    w("- %d/%d endpoints covered; endpoint inventory %s between the two builds."
+      % (len(endpoint_rows) - len(uncovered), len(endpoint_rows), "identical" if inventory_same else "DIFFERS"))
+    w("- Startup JDBC output (customers query) %s in every scenario."
+      % ("identical" if not any(k.endswith("/startup") for k, _ in failures) else "DIFFERS"))
     w("")
     w("| | Baseline | Candidate |")
     w("|---|---|---|")
@@ -298,45 +350,57 @@ def compare(args):
     w("Endpoints discovered statically from the controllers (`@RequestMapping` etc.); `ANY` means the "
       "mapping does not restrict the HTTP method.")
     w("")
-    w("| Method | Path | Controller | Steps covering it |")
+    w("| Method | Path | Controller | Requests covering it |")
     w("|---|---|---|---|")
     for ep, hits in endpoint_rows:
         w("| %s | `%s` | %s | %d |" % (ep["method"], ep["path"], ep["file"], len(hits)))
     w("")
     if failures:
-        w("## Differences")
+        w("## Unexplained differences")
         w("")
-        for key, d, bb, cb in failures:
+        for key, diffs in failures:
             w("### `%s`" % key)
             w("")
-            for x in d:
-                w("- %s" % x)
-            if bb is not None and cb is not None and bb != cb:
-                w("")
-                w("```diff")
-                for line in difflib.unified_diff([bb], [cb], "baseline", "candidate", lineterm=""):
-                    w(line)
-                w("```")
+            for d in diffs:
+                w("- %s" % describe(d))
+                if d[0] in ("body", "startup JDBC output"):
+                    diff_block(w, str(d[1]), str(d[2]))
             w("")
-    w("## Responses")
+    if accepted:
+        w("## Accepted differences")
+        w("")
+        for r in rules:
+            hits = [(k, d) for k, ds in accepted for d, rr in ds if rr is r]
+            if not hits:
+                continue
+            w("### `%s` (%d requests)" % (r["id"], len(hits)))
+            w("")
+            w(r["reason"])
+            w("")
+            for k, d in hits:
+                w("- `%s`: %s" % (k, describe(d)))
+                if d[0] == "body":
+                    diff_block(w, d[1], d[2])
+            w("")
+    w("## All requests")
     w("")
-    w("| Scenario | Step | Request | Baseline | Candidate | Match |")
+    w("| Scenario | Step | Request | Baseline | Candidate | Result |")
     w("|---|---|---|---|---|---|")
-    for scen, st, b, c, same in rows:
+    for scen, st, b, c, verdict in rows:
         req = "%s %s" % (st["request"]["method"], st["request"]["path"])
         fmt = lambda r: "-" if r is None else "%s `%s`" % (r["status"], (r["headers"].get("content-type") or "no body"))
-        w("| %s | %s | `%s` | %s | %s | %s |" % (scen, st["id"], md_escape(req), fmt(b), fmt(c),
-                                                 "yes" if same else "**NO**"))
+        w("| %s | %s | `%s` | %s | %s | %s |" % (scen, st["id"], md_escape(req), fmt(b), fmt(c), verdict))
     w("")
     report = "\n".join(out)
     if args.report:
         with open(args.report, "w") as f:
             f.write(report)
         print("wrote %s" % args.report)
-    print("%s: %d/%d responses match, %d uncovered endpoints, inventory %s"
-          % ("PASS" if ok else "FAIL", matched, total, len(uncovered), "same" if inventory_same else "differs"))
-    for key, d, _, _ in failures:
-        print("  DIFF %s: %s" % (key, "; ".join(d)))
+    print("%s: %d requests, %d identical, %d accepted, %d unexplained; %d uncovered endpoints; inventory %s"
+          % ("PASS" if ok else "FAIL", total, identical, len(accepted), len(failures), len(uncovered),
+             "same" if inventory_same else "differs"))
+    for key, diffs in failures:
+        print("  DIFF %s: %s" % (key, "; ".join(describe(d) for d in diffs)))
     return 0 if ok else 1
 
 
@@ -354,6 +418,8 @@ def main():
     k.add_argument("baseline")
     k.add_argument("candidate")
     k.add_argument("--report")
+    k.add_argument("--accepted", default=os.path.join(HERE, "accepted-differences.json"),
+                   help="reviewed differences that do not fail the comparison ('' to disable)")
     a = ap.parse_args()
     if a.cmd == "capture":
         capture(a)

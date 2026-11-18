@@ -5,12 +5,14 @@ import hello.declaration.TimeClient;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 public class SimpleTimeClient  implements TimeClient {
     private LocalDateTime dateAndTime;
 
     public SimpleTimeClient() {
-        dateAndTime = LocalDateTime.now();
+        // Java 8's clock had millisecond precision; Java 9+ is finer. Truncate to keep the same output format.
+        dateAndTime = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
     }
 
     @Override
