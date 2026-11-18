@@ -1,0 +1,103 @@
+{
+  "description": "Ordered HTTP scenarios replayed against a freshly started instance of the app. Each scenario gets its own JVM and its own working directory built from 'workdir', so state (topic list, greeting counter, file-system endpoints) is identical on every build.",
+  "workdir": {
+    "empty_files": [
+      "README.md", "application.properties", "build.gradle", "gradlew", "gradlew.bat",
+      "gs-spring-boot.iml", "mvnw", "mvnw.cmd", "pom.xml",
+      "gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.properties",
+      ".mvn/wrapper/maven-wrapper.properties"
+    ],
+    "copy_files": {"temp.txt": "fixture/temp.txt"}
+  },
+  "scenarios": [
+    {
+      "name": "read-only",
+      "steps": [
+        {"id": "greeting-default", "method": "GET", "path": "/"},
+        {"id": "greeting-name", "method": "GET", "path": "/?name=Devin"},
+        {"id": "greeting-empty-name", "method": "GET", "path": "/?name="},
+        {"id": "greeting-post", "method": "POST", "path": "/"},
+        {"id": "greeting-unicode", "method": "GET", "path": "/?name=%C3%9Cnic%C3%B8de"},
+        {"id": "topics-list", "method": "GET", "path": "/topic"},
+        {"id": "topics-list-head", "method": "HEAD", "path": "/topic"},
+        {"id": "topics-list-trailing-slash", "method": "GET", "path": "/topic/"},
+        {"id": "topics-list-xml-accept", "method": "GET", "path": "/topic", "headers": {"Accept": "application/xml"}},
+        {"id": "topics-options", "method": "OPTIONS", "path": "/topic"},
+        {"id": "topic-java", "method": "GET", "path": "/topic/java"},
+        {"id": "topic-spring", "method": "GET", "path": "/topic/spring"},
+        {"id": "topic-java-trailing-slash", "method": "GET", "path": "/topic/java/"},
+        {"id": "topic-missing", "method": "GET", "path": "/topic/nope"},
+        {"id": "topic-dotted-id", "method": "GET", "path": "/topic/java.json"},
+        {"id": "min-length-4", "method": "GET", "path": "/topic/minimum/length/4"},
+        {"id": "min-length-0", "method": "GET", "path": "/topic/minimum/length/0"},
+        {"id": "min-length-negative", "method": "GET", "path": "/topic/minimum/length/-1"},
+        {"id": "min-length-100", "method": "GET", "path": "/topic/minimum/length/100"},
+        {"id": "min-length-not-a-number", "method": "GET", "path": "/topic/minimum/length/abc"},
+        {"id": "string-operation", "method": "GET", "path": "/topic/string/operation"},
+        {"id": "file-operation", "method": "GET", "path": "/topic/file/operation"},
+        {"id": "datetime", "method": "GET", "path": "/datetime"},
+        {"id": "static-index", "method": "GET", "path": "/index.html"},
+        {"id": "unknown-path", "method": "GET", "path": "/does-not-exist"},
+        {"id": "sort", "method": "GET", "path": "/topic/sort"},
+        {"id": "topics-list-after-sort", "method": "GET", "path": "/topic"},
+        {"id": "string-operation-after-sort", "method": "GET", "path": "/topic/string/operation"},
+        {"id": "greeting-counter-after", "method": "GET", "path": "/"}
+      ]
+    },
+    {
+      "name": "crud",
+      "steps": [
+        {"id": "add-python", "method": "POST", "path": "/topic", "json": {"id": "python", "subjectName": "Python", "subjectDescription": "Python Description"}},
+        {"id": "list-after-add", "method": "GET", "path": "/topic"},
+        {"id": "get-python", "method": "GET", "path": "/topic/python"},
+        {"id": "update-python", "method": "PUT", "path": "/topic/python", "json": {"id": "python", "subjectName": "Python 3", "subjectDescription": "Updated"}},
+        {"id": "get-python-after-update", "method": "GET", "path": "/topic/python"},
+        {"id": "update-missing", "method": "PUT", "path": "/topic/missing", "json": {"id": "missing", "subjectName": "x", "subjectDescription": "y"}},
+        {"id": "update-renames-id", "method": "PUT", "path": "/topic/spring", "json": {"id": "springboot", "subjectName": "Spring Boot", "subjectDescription": "Renamed"}},
+        {"id": "get-old-id-after-rename", "method": "GET", "path": "/topic/spring"},
+        {"id": "get-new-id-after-rename", "method": "GET", "path": "/topic/springboot"},
+        {"id": "add-unknown-fields", "method": "POST", "path": "/topic", "json": {"id": "go", "subjectName": "Go", "subjectDescription": "Go Description", "extra": 42}},
+        {"id": "add-partial", "method": "POST", "path": "/topic", "json": {"id": "rust"}},
+        {"id": "get-partial", "method": "GET", "path": "/topic/rust"},
+        {"id": "add-duplicate-id", "method": "POST", "path": "/topic", "json": {"id": "java", "subjectName": "Duplicate", "subjectDescription": "Dup"}},
+        {"id": "get-duplicate-first-wins", "method": "GET", "path": "/topic/java"},
+        {"id": "delete-java", "method": "DELETE", "path": "/topic/java"},
+        {"id": "delete-missing", "method": "DELETE", "path": "/topic/missing"},
+        {"id": "list-after-delete", "method": "GET", "path": "/topic"},
+        {"id": "min-length-after-crud", "method": "GET", "path": "/topic/minimum/length/4"},
+        {"id": "sort-after-crud", "method": "GET", "path": "/topic/sort"},
+        {"id": "string-operation-after-crud", "method": "GET", "path": "/topic/string/operation"}
+      ]
+    },
+    {
+      "name": "request-errors",
+      "steps": [
+        {"id": "post-no-body", "method": "POST", "path": "/topic", "headers": {"Content-Type": "application/json"}},
+        {"id": "post-malformed-json", "method": "POST", "path": "/topic", "raw": "{\"id\": ", "headers": {"Content-Type": "application/json"}},
+        {"id": "post-text-plain", "method": "POST", "path": "/topic", "raw": "hello", "headers": {"Content-Type": "text/plain"}},
+        {"id": "post-json-array", "method": "POST", "path": "/topic", "raw": "[1,2]", "headers": {"Content-Type": "application/json"}},
+        {"id": "put-no-body", "method": "PUT", "path": "/topic/java", "headers": {"Content-Type": "application/json"}},
+        {"id": "delete-collection", "method": "DELETE", "path": "/topic"},
+        {"id": "patch-topic", "method": "PATCH", "path": "/topic/java", "json": {"id": "java"}},
+        {"id": "post-on-item", "method": "POST", "path": "/topic/java", "json": {"id": "java"}},
+        {"id": "min-length-missing-segment", "method": "GET", "path": "/topic/minimum/length/"},
+        {"id": "min-length-overflow", "method": "GET", "path": "/topic/minimum/length/99999999999"},
+        {"id": "list-unchanged", "method": "GET", "path": "/topic"}
+      ]
+    },
+    {
+      "name": "null-id-topic",
+      "steps": [
+        {"id": "add-without-id", "method": "POST", "path": "/topic", "json": {"subjectName": "No Id", "subjectDescription": "Missing id"}},
+        {"id": "list-with-null-id", "method": "GET", "path": "/topic"},
+        {"id": "get-existing-before-null", "method": "GET", "path": "/topic/java"},
+        {"id": "get-missing-hits-null", "method": "GET", "path": "/topic/nope"},
+        {"id": "min-length-hits-null", "method": "GET", "path": "/topic/minimum/length/1"},
+        {"id": "string-operation-hits-null", "method": "GET", "path": "/topic/string/operation"},
+        {"id": "update-hits-null", "method": "PUT", "path": "/topic/nope", "json": {"id": "nope"}},
+        {"id": "sort-hits-null", "method": "GET", "path": "/topic/sort"},
+        {"id": "delete-hits-null", "method": "DELETE", "path": "/topic/java"}
+      ]
+    }
+  ]
+}

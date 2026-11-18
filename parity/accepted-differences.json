@@ -1,0 +1,19 @@
+{
+  "description": "Reviewed, intentional differences between the baseline and the upgraded build. Every instance is still listed in the report; anything not matched here fails the comparison.",
+  "rules": [
+    {
+      "id": "error-message-wording",
+      "field": "error-message",
+      "steps": "*",
+      "reason": "Only the human-readable `message` of a Spring Boot error response differs; status, `error`, `path` and the set of fields are identical. The wording comes from the framework and JDK (Spring 6 dropped 'nested exception is ...', Jackson 2.17 rephrased parse errors, Spring 6.1 reports 'No static resource ...' for unmapped paths, and JDK 14+ adds helpful NullPointerException messages)."
+    },
+    {
+      "id": "options-allow-header",
+      "field": "allow",
+      "steps": "read-only/topics-options",
+      "baseline": "POST",
+      "candidate": "POST,OPTIONS",
+      "reason": "Spring Framework 6 adds OPTIONS to the Allow header of its built-in OPTIONS handling. The status and empty body are unchanged; the old value was incomplete (GET was also allowed)."
+    }
+  ]
+}

@@ -76,8 +76,12 @@ GET /datetime
 
 ### Prerequisites
 
-1) Java sdk
+1) JDK 21
 2) POSTMAN
+
+Built on Spring Boot 3.3. Build with `./mvnw package` or `./gradlew bootJar` and run
+`java -jar target/gs-spring-boot-0.1.0.jar`. The HTTP responses are checked against the
+original Java 8 / Spring Boot 2.0 build by the parity harness in [`parity/`](parity/README.md).
 
 ### Installing
 
