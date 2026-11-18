@@ -1,0 +1,47 @@
+// Architecture of springboot-java8 as it is on master.
+// Edit this file, then run ./render.sh to regenerate architecture.png and architecture.svg.
+digraph architecture {
+    graph [rankdir=TB, fontname="DejaVu Sans", fontsize=18, labelloc=t, nodesep=0.35, ranksep=0.7,
+           label="springboot-java8 (master): one Spring Boot 2.0.2 process on Java 8, port 8080", pad=0.3];
+    node  [shape=box, style="rounded,filled", fillcolor=white, fontname="DejaVu Sans", fontsize=16, margin="0.18,0.08"];
+    edge  [fontname="DejaVu Sans", fontsize=13, color="#555555"];
+
+    client [label="HTTP client\n(Postman, curl)", shape=box, fillcolor="#eeeeee"];
+
+    subgraph cluster_app {
+        label="Spring Boot application (package hello)"; fontsize=16; style="rounded,dashed"; color="#888888";
+
+        tomcat [label="Embedded Tomcat :8080\n+ Spring MVC DispatcherServlet", fillcolor="#dbe9f6"];
+
+        subgraph cluster_web {
+            label="hello.controller"; style="rounded"; color="#9db7d5";
+            greeting [label="GreetingController\nGET /  (?name=World)", fillcolor="#dbe9f6"];
+            topicc   [label="TopicController\n/topic  GET, POST\n/topic/{id}  GET, PUT, DELETE\n/topic/sort\n/topic/minimum/length/{minLength}", fillcolor="#dbe9f6"];
+            hello    [label="HelloController\n/datetime\n/topic/string/operation\n/topic/file/operation", fillcolor="#dbe9f6"];
+        }
+
+        service [label="TopicService (@Service, singleton)\nin-memory ArrayList<Topic>\nseeded: spring, java, javascript\nstreams, lambdas, regex, NIO", fillcolor="#e3f1df"];
+        predicate [label="CustomPredicate<T>\n(functional interface)", fillcolor="#f6f6f6"];
+        timeclient [label="SimpleTimeClient\nimplements TimeClient\n(default + static methods)", fillcolor="#f6f6f6"];
+
+        startup [label="Application\nmain() + CommandLineRunners\n(run once at startup)", fillcolor="#fbe5cf"];
+        jdbc [label="JdbcTemplate\n(Hikari pool)", fillcolor="#fbe5cf"];
+    }
+
+    h2   [label="H2 in-memory DB\ntable customers\n(rebuilt each start, no endpoint reads it)", shape=cylinder, fillcolor="#fbe5cf"];
+    fs   [label="Process working directory\nFiles.list / find / walk\nreads temp.txt", shape=folder, fillcolor="#f6f6f6"];
+    quote [label="gturnquist-quoters.cfapps.io\n/api/random (RestTemplate)\nhost no longer resolves:\nstartup fails", fillcolor="#f8d7d7", color="#b03030"];
+
+    client -> tomcat [label="JSON / text"];
+    tomcat -> greeting;
+    tomcat -> topicc;
+    tomcat -> hello;
+    topicc -> service [label="CRUD, sort, filter"];
+    hello  -> service [label="string + file demos"];
+    hello  -> timeclient [label="/datetime"];
+    service -> predicate [style=dashed];
+    service -> fs [label="NIO"];
+    startup -> jdbc [label="DROP / CREATE /\nINSERT / SELECT"];
+    jdbc -> h2;
+    startup -> quote [label="GET x2", color="#b03030", fontcolor="#b03030"];
+}

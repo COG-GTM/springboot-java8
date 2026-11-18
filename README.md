@@ -1,7 +1,7 @@
 # springboot-java8
 The project is made on spring boot. The project summarize the new features present in Java 8.
-It contain list of harcoded topics list. You can call the apis's with POSTMAN to add,delete,update Topic list
-In addition, it uses 
+It contains a hardcoded, in-memory list of topics. You can call the APIs with POSTMAN to add, delete and update topics.
+In addition, it uses: 
 1) Java 8 NIO methods 
 2) String operations
 3) Stream operations
@@ -14,15 +14,40 @@ In addition, it uses
 10) Java 8 LocalDateTime API
 11) Pattern
 
+## Architecture
 
+See [docs/architecture.md](docs/architecture.md) for the components, the full API behaviour, the startup sequence and the build files, with a diagram ([source](docs/diagrams/architecture.dot)).
+
+![Architecture diagram](docs/diagrams/architecture.png)
 
 ## Getting Started
-1) Download or clone the project with link 
-(https://github.com/RehmanMuradAli/springboot-java8/)
+
+Clone the project:
+
+```
+git clone https://github.com/COG-GTM/springboot-java8.git
+```
+
+### Prerequisites
+
+1) JDK 8
+2) Maven 3
+3) POSTMAN, curl or any other HTTP client
+
+### Running
+
+The app listens on `localhost:8080`. Start it from the repository root, because `/topic/file/operation` reads the current working directory and `temp.txt`.
+
+Two things on `master` stop the usual `mvn spring-boot:run` / `java -jar` flow:
+
+1) `pom.xml` declares `<packaging>pom</packaging>`, so `mvn package` succeeds without compiling anything or building a jar.
+2) At startup the app fetches a quote from `http://gturnquist-quoters.cfapps.io/api/random`. That host no longer resolves, so startup fails with `UnknownHostException`.
+
+[Running master locally](docs/architecture.md#running-master-locally) has the commands that compile and start the unchanged code with a local stand-in for the quote service. The Gradle files (`build.gradle`, Gradle 4.6 wrapper) do not declare the JDBC and H2 dependencies, so use Maven.
 
 ## Available API's
 
-Greetings
+Greetings (optional `?name=`, defaults to `World`)
 ```
 GET /
 ```
@@ -53,7 +78,7 @@ Get all Topics whose ID's length is greater than minLength
 GET /topic/minimum/length/{minLength}
 ```
 
-Get all Topics sorted by ID
+Get all Topics sorted by ID (sorts the stored list in place)
 ```
 GET /topic/sort
 ```
@@ -72,24 +97,7 @@ Java 8 Date Time example
 GET /datetime
 ```
 
-
-
-### Prerequisites
-
-1) Java sdk
-2) POSTMAN
-
-### Installing
-
-
-
-```
-1) Download or clone
-2) Import the project
-3) Run on location machine
-4) Open Postman, to call API's (  localhost:8080 )
-```
-
+Topic bodies are JSON: `{"id": "go", "subjectName": "Go", "subjectDescription": "Go Description"}`. Topics are kept in memory and reset on every restart.
 
 ## Helpful Links
 Spring:
