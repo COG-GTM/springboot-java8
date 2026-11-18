@@ -1,0 +1,1575 @@
+{
+  "meta": {
+    "label": "Java 8 / Spring Boot 2.0.2 (baseline)",
+    "java": "openjdk version \"1.8.0_504\"",
+    "spring_boot": "2.0.2.RELEASE",
+    "build_jdk": "1.8.0_504",
+    "git_sha": "d87c5ea",
+    "captured_at": "2026-11-18T02:46:06+00:00",
+    "jvm_opts": [
+      "-Duser.timezone=UTC",
+      "-Duser.language=en",
+      "-Duser.country=US",
+      "-Dfile.encoding=UTF-8"
+    ]
+  },
+  "endpoints": [
+    {
+      "method": "ANY",
+      "path": "/",
+      "file": "GreetingController.java"
+    },
+    {
+      "method": "ANY",
+      "path": "/datetime",
+      "file": "HelloController.java"
+    },
+    {
+      "method": "ANY",
+      "path": "/topic",
+      "file": "TopicController.java"
+    },
+    {
+      "method": "POST",
+      "path": "/topic",
+      "file": "TopicController.java"
+    },
+    {
+      "method": "ANY",
+      "path": "/topic/file/operation",
+      "file": "HelloController.java"
+    },
+    {
+      "method": "ANY",
+      "path": "/topic/minimum/length/{minLength}",
+      "file": "TopicController.java"
+    },
+    {
+      "method": "ANY",
+      "path": "/topic/sort",
+      "file": "TopicController.java"
+    },
+    {
+      "method": "ANY",
+      "path": "/topic/string/operation",
+      "file": "HelloController.java"
+    },
+    {
+      "method": "ANY",
+      "path": "/topic/{id}",
+      "file": "TopicController.java"
+    },
+    {
+      "method": "DELETE",
+      "path": "/topic/{id}",
+      "file": "TopicController.java"
+    },
+    {
+      "method": "PUT",
+      "path": "/topic/{id}",
+      "file": "TopicController.java"
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "read-only",
+      "startup_customers": [
+        "Customer{id=3, firstName='Josh', lastName='Bloch'}",
+        "Customer{id=4, firstName='Josh', lastName='Long'}"
+      ],
+      "steps": [
+        {
+          "id": "greeting-default",
+          "request": {
+            "method": "GET",
+            "path": "/"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":1,\"content\":\"Hello, World!\"}",
+            "body_normalized": "{\"id\":1,\"content\":\"Hello, World!\"}"
+          }
+        },
+        {
+          "id": "greeting-name",
+          "request": {
+            "method": "GET",
+            "path": "/?name=Devin"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":2,\"content\":\"Hello, Devin!\"}",
+            "body_normalized": "{\"id\":2,\"content\":\"Hello, Devin!\"}"
+          }
+        },
+        {
+          "id": "greeting-empty-name",
+          "request": {
+            "method": "GET",
+            "path": "/?name="
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":3,\"content\":\"Hello, World!\"}",
+            "body_normalized": "{\"id\":3,\"content\":\"Hello, World!\"}"
+          }
+        },
+        {
+          "id": "greeting-post",
+          "request": {
+            "method": "POST",
+            "path": "/"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":4,\"content\":\"Hello, World!\"}",
+            "body_normalized": "{\"id\":4,\"content\":\"Hello, World!\"}"
+          }
+        },
+        {
+          "id": "greeting-unicode",
+          "request": {
+            "method": "GET",
+            "path": "/?name=%C3%9Cnic%C3%B8de"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":5,\"content\":\"Hello, Ünicøde!\"}",
+            "body_normalized": "{\"id\":5,\"content\":\"Hello, Ünicøde!\"}"
+          }
+        },
+        {
+          "id": "topics-list",
+          "request": {
+            "method": "GET",
+            "path": "/topic"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]",
+            "body_normalized": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]"
+          }
+        },
+        {
+          "id": "topics-list-head",
+          "request": {
+            "method": "HEAD",
+            "path": "/topic"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "topics-list-trailing-slash",
+          "request": {
+            "method": "GET",
+            "path": "/topic/"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]",
+            "body_normalized": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]"
+          }
+        },
+        {
+          "id": "topics-list-xml-accept",
+          "request": {
+            "method": "GET",
+            "path": "/topic",
+            "headers": {
+              "Accept": "application/xml"
+            }
+          },
+          "response": {
+            "status": 406,
+            "headers": {
+              "content-type": null,
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "topics-options",
+          "request": {
+            "method": "OPTIONS",
+            "path": "/topic"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": null,
+              "allow": "POST"
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "topic-java",
+          "request": {
+            "method": "GET",
+            "path": "/topic/java"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"}",
+            "body_normalized": "{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"}"
+          }
+        },
+        {
+          "id": "topic-spring",
+          "request": {
+            "method": "GET",
+            "path": "/topic/spring"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"}",
+            "body_normalized": "{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"}"
+          }
+        },
+        {
+          "id": "topic-java-trailing-slash",
+          "request": {
+            "method": "GET",
+            "path": "/topic/java/"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"}",
+            "body_normalized": "{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"}"
+          }
+        },
+        {
+          "id": "topic-missing",
+          "request": {
+            "method": "GET",
+            "path": "/topic/nope"
+          },
+          "response": {
+            "status": 500,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:08.477+0000\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No value present\",\"path\":\"/topic/nope\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No value present\",\"path\":\"/topic/nope\"}"
+          }
+        },
+        {
+          "id": "topic-dotted-id",
+          "request": {
+            "method": "GET",
+            "path": "/topic/java.json"
+          },
+          "response": {
+            "status": 500,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:08.483+0000\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No value present\",\"path\":\"/topic/java.json\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No value present\",\"path\":\"/topic/java.json\"}"
+          }
+        },
+        {
+          "id": "min-length-4",
+          "request": {
+            "method": "GET",
+            "path": "/topic/minimum/length/4"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]",
+            "body_normalized": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]"
+          }
+        },
+        {
+          "id": "min-length-0",
+          "request": {
+            "method": "GET",
+            "path": "/topic/minimum/length/0"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]",
+            "body_normalized": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]"
+          }
+        },
+        {
+          "id": "min-length-negative",
+          "request": {
+            "method": "GET",
+            "path": "/topic/minimum/length/-1"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]",
+            "body_normalized": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]"
+          }
+        },
+        {
+          "id": "min-length-100",
+          "request": {
+            "method": "GET",
+            "path": "/topic/minimum/length/100"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[]",
+            "body_normalized": "[]"
+          }
+        },
+        {
+          "id": "min-length-not-a-number",
+          "request": {
+            "method": "GET",
+            "path": "/topic/minimum/length/abc"
+          },
+          "response": {
+            "status": 400,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:08.494+0000\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer'; nested exception is java.lang.NumberFormatException: For input string: \\\"abc\\\"\",\"path\":\"/topic/minimum/length/abc\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer'; nested exception is java.lang.NumberFormatException: For input string: \\\"abc\\\"\",\"path\":\"/topic/minimum/length/abc\"}"
+          }
+        },
+        {
+          "id": "string-operation",
+          "request": {
+            "method": "GET",
+            "path": "/topic/string/operation"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "text/plain;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "Joining All String ID's with JOIN method: spring:java:javascript-------------Get all ID characters, select distict and sort with ID=   :acgijnprstv-------------Split All Id With Colon,Select ID With \"Java\" Keyword, Then Sort Then Join java:javascript-------------Return All ID having character 'g' in it:  [spring]",
+            "body_normalized": "Joining All String ID's with JOIN method: spring:java:javascript-------------Get all ID characters, select distict and sort with ID=   :acgijnprstv-------------Split All Id With Colon,Select ID With \"Java\" Keyword, Then Sort Then Join java:javascript-------------Return All ID having character 'g' in it:  [spring]"
+          }
+        },
+        {
+          "id": "file-operation",
+          "request": {
+            "method": "GET",
+            "path": "/topic/file/operation"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "text/plain;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "---------Find all files in path and sort:    README.md; application.properties; build.gradle; gradle; gradlew; gradlew.bat; gs-spring-boot.iml; mvnw; mvnw.cmd; pom.xml; temp.txt----------Find File in present directory which strats with \"grad\",provided maximum depth=25 and sort : gradle; gradle/wrapper; gradle/wrapper/gradle-wrapper.jar; gradle/wrapper/gradle-wrapper.properties; gradlew; gradlew.bat----------Find File in present directory which strats with \"grad\",provided maximum depth=25 and sort :  with walk functiongradle; gradle/wrapper; gradle/wrapper/gradle-wrapper.jar; gradle/wrapper/gradle-wrapper.properties; gradlew; gradlew.bat---------Read \"temp.txt\" file with stream functions, having \"print\" witin it:   Hello, this, is, Rehman",
+            "body_normalized": "---------Find all files in path and sort:    README.md; application.properties; build.gradle; gradle; gradlew; gradlew.bat; gs-spring-boot.iml; mvnw; mvnw.cmd; pom.xml; temp.txt----------Find File in present directory which strats with \"grad\",provided maximum depth=25 and sort : gradle; gradle/wrapper; gradle/wrapper/gradle-wrapper.jar; gradle/wrapper/gradle-wrapper.properties; gradlew; gradlew.bat----------Find File in present directory which strats with \"grad\",provided maximum depth=25 and sort :  with walk functiongradle; gradle/wrapper; gradle/wrapper/gradle-wrapper.jar; gradle/wrapper/gradle-wrapper.properties; gradlew; gradlew.bat---------Read \"temp.txt\" file with stream functions, having \"print\" witin it:   Hello, this, is, Rehman"
+          }
+        },
+        {
+          "id": "datetime",
+          "request": {
+            "method": "GET",
+            "path": "/datetime"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "text/plain;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "Greetings from Spring Boot! ----------------------Datetime now is 2026-11-18T02:46:08.507----------------------Datetime tomorrow will be 2026-11-19T02:46:08.507----------------------Datetime of previous month was 2026-10-18T02:46:08.507----------------------Is this a leap year ?  false----------------------Default system zone id   UTC-------------------Time in California: 2026-11-18T02:46:08.507-06:00[Canada/Central]",
+            "body_normalized": "Greetings from Spring Boot! ----------------------Datetime now is <DATETIME frac=3>----------------------Datetime tomorrow will be <DATETIME frac=3>----------------------Datetime of previous month was <DATETIME frac=3>----------------------Is this a leap year ?  false----------------------Default system zone id   UTC-------------------Time in California: <DATETIME frac=3>-06:00[Canada/Central]"
+          }
+        },
+        {
+          "id": "static-index",
+          "request": {
+            "method": "GET",
+            "path": "/index.html"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "text/html",
+              "allow": null
+            },
+            "other_headers": [
+              "accept-ranges",
+              "content-length",
+              "date",
+              "last-modified"
+            ],
+            "body": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Title</title>\n</head>\n<body>\n\n</body>\n</html>",
+            "body_normalized": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Title</title>\n</head>\n<body>\n\n</body>\n</html>"
+          }
+        },
+        {
+          "id": "unknown-path",
+          "request": {
+            "method": "GET",
+            "path": "/does-not-exist"
+          },
+          "response": {
+            "status": 404,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:08.515+0000\",\"status\":404,\"error\":\"Not Found\",\"message\":\"No message available\",\"path\":\"/does-not-exist\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":404,\"error\":\"Not Found\",\"message\":\"No message available\",\"path\":\"/does-not-exist\"}"
+          }
+        },
+        {
+          "id": "sort",
+          "request": {
+            "method": "GET",
+            "path": "/topic/sort"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"}]",
+            "body_normalized": "[{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"}]"
+          }
+        },
+        {
+          "id": "topics-list-after-sort",
+          "request": {
+            "method": "GET",
+            "path": "/topic"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"}]",
+            "body_normalized": "[{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"}]"
+          }
+        },
+        {
+          "id": "string-operation-after-sort",
+          "request": {
+            "method": "GET",
+            "path": "/topic/string/operation"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "text/plain;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "Joining All String ID's with JOIN method: java:javascript:spring-------------Get all ID characters, select distict and sort with ID=   :acgijnprstv-------------Split All Id With Colon,Select ID With \"Java\" Keyword, Then Sort Then Join java:javascript-------------Return All ID having character 'g' in it:  [spring]",
+            "body_normalized": "Joining All String ID's with JOIN method: java:javascript:spring-------------Get all ID characters, select distict and sort with ID=   :acgijnprstv-------------Split All Id With Colon,Select ID With \"Java\" Keyword, Then Sort Then Join java:javascript-------------Return All ID having character 'g' in it:  [spring]"
+          }
+        },
+        {
+          "id": "greeting-counter-after",
+          "request": {
+            "method": "GET",
+            "path": "/"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":6,\"content\":\"Hello, World!\"}",
+            "body_normalized": "{\"id\":6,\"content\":\"Hello, World!\"}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "crud",
+      "startup_customers": [
+        "Customer{id=3, firstName='Josh', lastName='Bloch'}",
+        "Customer{id=4, firstName='Josh', lastName='Long'}"
+      ],
+      "steps": [
+        {
+          "id": "add-python",
+          "request": {
+            "method": "POST",
+            "path": "/topic",
+            "json": {
+              "id": "python",
+              "subjectName": "Python",
+              "subjectDescription": "Python Description"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": null,
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "list-after-add",
+          "request": {
+            "method": "GET",
+            "path": "/topic"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":\"python\",\"subjectName\":\"Python\",\"subjectDescription\":\"Python Description\"}]",
+            "body_normalized": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":\"python\",\"subjectName\":\"Python\",\"subjectDescription\":\"Python Description\"}]"
+          }
+        },
+        {
+          "id": "get-python",
+          "request": {
+            "method": "GET",
+            "path": "/topic/python"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":\"python\",\"subjectName\":\"Python\",\"subjectDescription\":\"Python Description\"}",
+            "body_normalized": "{\"id\":\"python\",\"subjectName\":\"Python\",\"subjectDescription\":\"Python Description\"}"
+          }
+        },
+        {
+          "id": "update-python",
+          "request": {
+            "method": "PUT",
+            "path": "/topic/python",
+            "json": {
+              "id": "python",
+              "subjectName": "Python 3",
+              "subjectDescription": "Updated"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": null,
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "get-python-after-update",
+          "request": {
+            "method": "GET",
+            "path": "/topic/python"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":\"python\",\"subjectName\":\"Python 3\",\"subjectDescription\":\"Updated\"}",
+            "body_normalized": "{\"id\":\"python\",\"subjectName\":\"Python 3\",\"subjectDescription\":\"Updated\"}"
+          }
+        },
+        {
+          "id": "update-missing",
+          "request": {
+            "method": "PUT",
+            "path": "/topic/missing",
+            "json": {
+              "id": "missing",
+              "subjectName": "x",
+              "subjectDescription": "y"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": null,
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "update-renames-id",
+          "request": {
+            "method": "PUT",
+            "path": "/topic/spring",
+            "json": {
+              "id": "springboot",
+              "subjectName": "Spring Boot",
+              "subjectDescription": "Renamed"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": null,
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "get-old-id-after-rename",
+          "request": {
+            "method": "GET",
+            "path": "/topic/spring"
+          },
+          "response": {
+            "status": 500,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:10.512+0000\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No value present\",\"path\":\"/topic/spring\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No value present\",\"path\":\"/topic/spring\"}"
+          }
+        },
+        {
+          "id": "get-new-id-after-rename",
+          "request": {
+            "method": "GET",
+            "path": "/topic/springboot"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":\"springboot\",\"subjectName\":\"Spring Boot\",\"subjectDescription\":\"Renamed\"}",
+            "body_normalized": "{\"id\":\"springboot\",\"subjectName\":\"Spring Boot\",\"subjectDescription\":\"Renamed\"}"
+          }
+        },
+        {
+          "id": "add-unknown-fields",
+          "request": {
+            "method": "POST",
+            "path": "/topic",
+            "json": {
+              "id": "go",
+              "subjectName": "Go",
+              "subjectDescription": "Go Description",
+              "extra": 42
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": null,
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "add-partial",
+          "request": {
+            "method": "POST",
+            "path": "/topic",
+            "json": {
+              "id": "rust"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": null,
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "get-partial",
+          "request": {
+            "method": "GET",
+            "path": "/topic/rust"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":\"rust\",\"subjectName\":null,\"subjectDescription\":null}",
+            "body_normalized": "{\"id\":\"rust\",\"subjectName\":null,\"subjectDescription\":null}"
+          }
+        },
+        {
+          "id": "add-duplicate-id",
+          "request": {
+            "method": "POST",
+            "path": "/topic",
+            "json": {
+              "id": "java",
+              "subjectName": "Duplicate",
+              "subjectDescription": "Dup"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": null,
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "get-duplicate-first-wins",
+          "request": {
+            "method": "GET",
+            "path": "/topic/java"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"}",
+            "body_normalized": "{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"}"
+          }
+        },
+        {
+          "id": "delete-java",
+          "request": {
+            "method": "DELETE",
+            "path": "/topic/java"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": null,
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "delete-missing",
+          "request": {
+            "method": "DELETE",
+            "path": "/topic/missing"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": null,
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "list-after-delete",
+          "request": {
+            "method": "GET",
+            "path": "/topic"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"springboot\",\"subjectName\":\"Spring Boot\",\"subjectDescription\":\"Renamed\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":\"python\",\"subjectName\":\"Python 3\",\"subjectDescription\":\"Updated\"},{\"id\":\"go\",\"subjectName\":\"Go\",\"subjectDescription\":\"Go Description\"},{\"id\":\"rust\",\"subjectName\":null,\"subjectDescription\":null}]",
+            "body_normalized": "[{\"id\":\"springboot\",\"subjectName\":\"Spring Boot\",\"subjectDescription\":\"Renamed\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":\"python\",\"subjectName\":\"Python 3\",\"subjectDescription\":\"Updated\"},{\"id\":\"go\",\"subjectName\":\"Go\",\"subjectDescription\":\"Go Description\"},{\"id\":\"rust\",\"subjectName\":null,\"subjectDescription\":null}]"
+          }
+        },
+        {
+          "id": "min-length-after-crud",
+          "request": {
+            "method": "GET",
+            "path": "/topic/minimum/length/4"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"springboot\",\"subjectName\":\"Spring Boot\",\"subjectDescription\":\"Renamed\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":\"python\",\"subjectName\":\"Python 3\",\"subjectDescription\":\"Updated\"}]",
+            "body_normalized": "[{\"id\":\"springboot\",\"subjectName\":\"Spring Boot\",\"subjectDescription\":\"Renamed\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":\"python\",\"subjectName\":\"Python 3\",\"subjectDescription\":\"Updated\"}]"
+          }
+        },
+        {
+          "id": "sort-after-crud",
+          "request": {
+            "method": "GET",
+            "path": "/topic/sort"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"go\",\"subjectName\":\"Go\",\"subjectDescription\":\"Go Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":\"python\",\"subjectName\":\"Python 3\",\"subjectDescription\":\"Updated\"},{\"id\":\"rust\",\"subjectName\":null,\"subjectDescription\":null},{\"id\":\"springboot\",\"subjectName\":\"Spring Boot\",\"subjectDescription\":\"Renamed\"}]",
+            "body_normalized": "[{\"id\":\"go\",\"subjectName\":\"Go\",\"subjectDescription\":\"Go Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":\"python\",\"subjectName\":\"Python 3\",\"subjectDescription\":\"Updated\"},{\"id\":\"rust\",\"subjectName\":null,\"subjectDescription\":null},{\"id\":\"springboot\",\"subjectName\":\"Spring Boot\",\"subjectDescription\":\"Renamed\"}]"
+          }
+        },
+        {
+          "id": "string-operation-after-crud",
+          "request": {
+            "method": "GET",
+            "path": "/topic/string/operation"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "text/plain;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "Joining All String ID's with JOIN method: go:javascript:python:rust:springboot-------------Get all ID characters, select distict and sort with ID=   :abcghijnoprstuvy-------------Split All Id With Colon,Select ID With \"Java\" Keyword, Then Sort Then Join javascript-------------Return All ID having character 'g' in it:  [go, springboot]",
+            "body_normalized": "Joining All String ID's with JOIN method: go:javascript:python:rust:springboot-------------Get all ID characters, select distict and sort with ID=   :abcghijnoprstuvy-------------Split All Id With Colon,Select ID With \"Java\" Keyword, Then Sort Then Join javascript-------------Return All ID having character 'g' in it:  [go, springboot]"
+          }
+        }
+      ]
+    },
+    {
+      "name": "request-errors",
+      "startup_customers": [
+        "Customer{id=3, firstName='Josh', lastName='Bloch'}",
+        "Customer{id=4, firstName='Josh', lastName='Long'}"
+      ],
+      "steps": [
+        {
+          "id": "post-no-body",
+          "request": {
+            "method": "POST",
+            "path": "/topic",
+            "headers": {
+              "Content-Type": "application/json"
+            }
+          },
+          "response": {
+            "status": 400,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:12.490+0000\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"Required request body is missing: public void hello.controller.TopicController.addTopic(hello.model.Topic)\",\"path\":\"/topic\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"Required request body is missing: public void hello.controller.TopicController.addTopic(hello.model.Topic)\",\"path\":\"/topic\"}"
+          }
+        },
+        {
+          "id": "post-malformed-json",
+          "request": {
+            "method": "POST",
+            "path": "/topic",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "raw": "{\"id\": "
+          },
+          "response": {
+            "status": 400,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:12.517+0000\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"JSON parse error: Unexpected end-of-input within/between Object entries; nested exception is com.fasterxml.jackson.core.io.JsonEOFException: Unexpected end-of-input within/between Object entries\\n at [Source: (PushbackInputStream); line: 1, column: 15]\",\"path\":\"/topic\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"JSON parse error: Unexpected end-of-input within/between Object entries; nested exception is com.fasterxml.jackson.core.io.JsonEOFException: Unexpected end-of-input within/between Object entries\\n at [Source: (PushbackInputStream); line: 1, column: 15]\",\"path\":\"/topic\"}"
+          }
+        },
+        {
+          "id": "post-text-plain",
+          "request": {
+            "method": "POST",
+            "path": "/topic",
+            "headers": {
+              "Content-Type": "text/plain"
+            },
+            "raw": "hello"
+          },
+          "response": {
+            "status": 415,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:12.520+0000\",\"status\":415,\"error\":\"Unsupported Media Type\",\"message\":\"Content type 'text/plain;charset=UTF-8' not supported\",\"path\":\"/topic\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":415,\"error\":\"Unsupported Media Type\",\"message\":\"Content type 'text/plain;charset=UTF-8' not supported\",\"path\":\"/topic\"}"
+          }
+        },
+        {
+          "id": "post-json-array",
+          "request": {
+            "method": "POST",
+            "path": "/topic",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "raw": "[1,2]"
+          },
+          "response": {
+            "status": 400,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:12.524+0000\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"JSON parse error: Cannot deserialize instance of `hello.model.Topic` out of START_ARRAY token; nested exception is com.fasterxml.jackson.databind.exc.MismatchedInputException: Cannot deserialize instance of `hello.model.Topic` out of START_ARRAY token\\n at [Source: (PushbackInputStream); line: 1, column: 1]\",\"path\":\"/topic\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"JSON parse error: Cannot deserialize instance of `hello.model.Topic` out of START_ARRAY token; nested exception is com.fasterxml.jackson.databind.exc.MismatchedInputException: Cannot deserialize instance of `hello.model.Topic` out of START_ARRAY token\\n at [Source: (PushbackInputStream); line: 1, column: 1]\",\"path\":\"/topic\"}"
+          }
+        },
+        {
+          "id": "put-no-body",
+          "request": {
+            "method": "PUT",
+            "path": "/topic/java",
+            "headers": {
+              "Content-Type": "application/json"
+            }
+          },
+          "response": {
+            "status": 400,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:12.529+0000\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"Required request body is missing: public void hello.controller.TopicController.updateTopic(java.lang.String,hello.model.Topic)\",\"path\":\"/topic/java\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"Required request body is missing: public void hello.controller.TopicController.updateTopic(java.lang.String,hello.model.Topic)\",\"path\":\"/topic/java\"}"
+          }
+        },
+        {
+          "id": "delete-collection",
+          "request": {
+            "method": "DELETE",
+            "path": "/topic"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]",
+            "body_normalized": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]"
+          }
+        },
+        {
+          "id": "patch-topic",
+          "request": {
+            "method": "PATCH",
+            "path": "/topic/java",
+            "json": {
+              "id": "java"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"}",
+            "body_normalized": "{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"}"
+          }
+        },
+        {
+          "id": "post-on-item",
+          "request": {
+            "method": "POST",
+            "path": "/topic/java",
+            "json": {
+              "id": "java"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"}",
+            "body_normalized": "{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"}"
+          }
+        },
+        {
+          "id": "min-length-missing-segment",
+          "request": {
+            "method": "GET",
+            "path": "/topic/minimum/length/"
+          },
+          "response": {
+            "status": 404,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:12.545+0000\",\"status\":404,\"error\":\"Not Found\",\"message\":\"No message available\",\"path\":\"/topic/minimum/length/\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":404,\"error\":\"Not Found\",\"message\":\"No message available\",\"path\":\"/topic/minimum/length/\"}"
+          }
+        },
+        {
+          "id": "min-length-overflow",
+          "request": {
+            "method": "GET",
+            "path": "/topic/minimum/length/99999999999"
+          },
+          "response": {
+            "status": 400,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:12.547+0000\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer'; nested exception is java.lang.NumberFormatException: For input string: \\\"99999999999\\\"\",\"path\":\"/topic/minimum/length/99999999999\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer'; nested exception is java.lang.NumberFormatException: For input string: \\\"99999999999\\\"\",\"path\":\"/topic/minimum/length/99999999999\"}"
+          }
+        },
+        {
+          "id": "list-unchanged",
+          "request": {
+            "method": "GET",
+            "path": "/topic"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]",
+            "body_normalized": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"}]"
+          }
+        }
+      ]
+    },
+    {
+      "name": "null-id-topic",
+      "startup_customers": [
+        "Customer{id=3, firstName='Josh', lastName='Bloch'}",
+        "Customer{id=4, firstName='Josh', lastName='Long'}"
+      ],
+      "steps": [
+        {
+          "id": "add-without-id",
+          "request": {
+            "method": "POST",
+            "path": "/topic",
+            "json": {
+              "subjectName": "No Id",
+              "subjectDescription": "Missing id"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": null,
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "list-with-null-id",
+          "request": {
+            "method": "GET",
+            "path": "/topic"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":null,\"subjectName\":\"No Id\",\"subjectDescription\":\"Missing id\"}]",
+            "body_normalized": "[{\"id\":\"spring\",\"subjectName\":\"Spring Framework\",\"subjectDescription\":\"Spring Framework Description\"},{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"},{\"id\":\"javascript\",\"subjectName\":\"javascript Framework\",\"subjectDescription\":\"javascript Framework Description\"},{\"id\":null,\"subjectName\":\"No Id\",\"subjectDescription\":\"Missing id\"}]"
+          }
+        },
+        {
+          "id": "get-existing-before-null",
+          "request": {
+            "method": "GET",
+            "path": "/topic/java"
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"}",
+            "body_normalized": "{\"id\":\"java\",\"subjectName\":\"Core Java\",\"subjectDescription\":\"Java Description\"}"
+          }
+        },
+        {
+          "id": "get-missing-hits-null",
+          "request": {
+            "method": "GET",
+            "path": "/topic/nope"
+          },
+          "response": {
+            "status": 500,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:14.518+0000\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No message available\",\"path\":\"/topic/nope\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No message available\",\"path\":\"/topic/nope\"}"
+          }
+        },
+        {
+          "id": "min-length-hits-null",
+          "request": {
+            "method": "GET",
+            "path": "/topic/minimum/length/1"
+          },
+          "response": {
+            "status": 500,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:14.531+0000\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No message available\",\"path\":\"/topic/minimum/length/1\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No message available\",\"path\":\"/topic/minimum/length/1\"}"
+          }
+        },
+        {
+          "id": "string-operation-hits-null",
+          "request": {
+            "method": "GET",
+            "path": "/topic/string/operation"
+          },
+          "response": {
+            "status": 500,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:14.536+0000\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No message available\",\"path\":\"/topic/string/operation\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No message available\",\"path\":\"/topic/string/operation\"}"
+          }
+        },
+        {
+          "id": "update-hits-null",
+          "request": {
+            "method": "PUT",
+            "path": "/topic/nope",
+            "json": {
+              "id": "nope"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "content-type": null,
+              "allow": null
+            },
+            "other_headers": [
+              "content-length",
+              "date"
+            ],
+            "body": "",
+            "body_normalized": ""
+          }
+        },
+        {
+          "id": "sort-hits-null",
+          "request": {
+            "method": "GET",
+            "path": "/topic/sort"
+          },
+          "response": {
+            "status": 500,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:14.543+0000\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No message available\",\"path\":\"/topic/sort\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No message available\",\"path\":\"/topic/sort\"}"
+          }
+        },
+        {
+          "id": "delete-hits-null",
+          "request": {
+            "method": "DELETE",
+            "path": "/topic/java"
+          },
+          "response": {
+            "status": 500,
+            "headers": {
+              "content-type": "application/json;charset=UTF-8",
+              "allow": null
+            },
+            "other_headers": [
+              "connection",
+              "date",
+              "transfer-encoding"
+            ],
+            "body": "{\"timestamp\":\"2026-11-18T02:46:14.547+0000\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No message available\",\"path\":\"/topic/java\"}",
+            "body_normalized": "{\"timestamp\":\"<TIMESTAMP>\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"No message available\",\"path\":\"/topic/java\"}"
+          }
+        }
+      ]
+    }
+  ]
+}
